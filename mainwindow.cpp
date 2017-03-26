@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction( ui->actionStart );
     ui->mainToolBar->addAction( ui->actionStop );
     ui->mainToolBar->addAction( ui->actionDisconnect );
+    ui->mainToolBar->addAction( ui->actionConfigure_Port );
     ui->rawTab->setSerialDevice(m_serial);
 
     MessageLogger::instance()->setOutWidget(ui->logsEdit);
@@ -99,18 +100,21 @@ void MainWindow::initStateMachine()
     stateDisconnected->assignProperty(ui->actionStop, "enabled", false);
     stateDisconnected->assignProperty(ui->actionDisconnect, "enabled", false);
     stateDisconnected->assignProperty(ui->actionConfigure_Port, "enabled", true);
+    stateDisconnected->assignProperty(ui->rawTab, "enabled", false);
     stateDisconnected->assignProperty(ui->statusBar, "statusColor", QColor(Qt::red));
 
     stateConnected->assignProperty(ui->actionStart, "enabled", true);
     stateConnected->assignProperty(ui->actionStop, "enabled", false);
     stateConnected->assignProperty(ui->actionDisconnect, "enabled", true);
     stateConnected->assignProperty(ui->actionConfigure_Port, "enabled", true);
+    stateConnected->assignProperty(ui->rawTab, "enabled", true);
     stateConnected->assignProperty(ui->statusBar, "statusColor", QColor(Qt::yellow));
 
     stateRunnig->assignProperty(ui->actionStart, "enabled", false);
     stateRunnig->assignProperty(ui->actionStop, "enabled", true);
     stateRunnig->assignProperty(ui->actionDisconnect, "enabled", false);
     stateRunnig->assignProperty(ui->actionConfigure_Port, "enabled", false);
+    stateRunnig->assignProperty(ui->rawTab, "enabled", true);
     stateRunnig->assignProperty(ui->statusBar, "statusColor", QColor(Qt::green));
 
     stateDisconnected->addTransition(m_serial, SIGNAL(opened()), stateConnected);
