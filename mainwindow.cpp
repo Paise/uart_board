@@ -1,12 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ui_about.h"
+#include "messagelogger.h"
 #include "configuredialog.h"
 #include "customstatusbar.h"
 #include "ext/QtAwesome/QtAwesome.h"
 #include <QDebug>
 #include <QState>
 #include <QStyle>
+#include <QFileDialog>
 
 #define SEND_PERIOD (1000)
 
@@ -20,20 +22,25 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->actionShow_Logs->setCheckable(true);
     ui->actionShow_Logs->setChecked(true);
+    ui->logsEdit->setReadOnly(true);
     ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     ui->mainToolBar->addAction( ui->actionStart );
     ui->mainToolBar->addAction( ui->actionStop );
     ui->mainToolBar->addAction( ui->actionDisconnect );
     m_sendTimer.setInterval(SEND_PERIOD);
 
+    MessageLogger::instance()->setOutWidget(ui->logsEdit);
     initIcons();
     initStateMachine();
 
+    connect(&m_serial, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(logPortError(QSerialPort::SerialPortError)));
     connect(&m_sendTimer, &QTimer::timeout, this, &MainWindow::sendData);
     connect(ui->actionConfigure_Port, &QAction::triggered, this, &MainWindow::configurePort);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
     connect(ui->actionShow_Logs, &QAction::triggered, ui->logsDockWidget, &QDockWidget::setVisible);
+    connect(ui->saveLogsButton, &QPushButton::clicked, this, &MainWindow::saveLogs);
+    connect(ui->clearLogsButton, &QPushButton::clicked, ui->logsEdit, &QTextEdit::clear);
 }
 
 MainWindow::~MainWindow()
@@ -140,14 +147,38 @@ void MainWindow::configurePort()
 
 void MainWindow::connectPort()
 {
-    if (m_serial.open(QIODevice::ReadWrite)) {
-        emit portOpened();
+    if (!m_serial.open(QIODevice::ReadWrite)) {
+        return;
     }
+    emit portOpened();
+    qDebug() << tr("Opened port \"%0\"").arg(m_serial.portName());
 }
 
 void MainWindow::disconnectPort()
 {
     m_serial.close();
+    qDebug() << tr("Closed port \"%0\"").arg(m_serial.portName());
+}
+
+void MainWindow::saveLogs()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Select a File"));
+    QFile logsFile(filename);
+
+    if (!logsFile.open(QFile::WriteOnly)) {
+        qDebug() << tr("Failed to open file %0 to save logs").arg(filename);
+        return;
+    }
+    logsFile.write(ui->logsEdit->toPlainText().toStdString().c_str());
+    logsFile.close();
+}
+
+void MainWindow::logPortError(QSerialPort::SerialPortError error)
+{
+    if (error == QSerialPort::NoError || error == QSerialPort::NotOpenError)
+        return;
+
+    qDebug() << tr("Error: %0, (code: %1)").arg(m_serial.errorString()).arg(error);
 }
 
 void MainWindow::processDisconnectState()
@@ -165,9 +196,11 @@ void MainWindow::processRunningState()
 {
     m_sendTimer.start();
     ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial.portName()));
+    qDebug() << tr("Start messaging");
 }
 
 void MainWindow::processStop()
 {
     m_sendTimer.stop();
+    qDebug() << tr("Stop messaging");
 }

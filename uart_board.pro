@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     configuredialog.cpp \
-    customstatusbar.cpp
+    customstatusbar.cpp \
+    messagelogger.cpp
 
 HEADERS  += mainwindow.h \
     configuredialog.h \
-    customstatusbar.h
+    customstatusbar.h \
+    messagelogger.h
 
 FORMS    += mainwindow.ui \
     configuredialog.ui \

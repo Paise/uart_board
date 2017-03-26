@@ -33,6 +33,8 @@ private slots:
     void configurePort();
     void connectPort();
     void disconnectPort();
+    void saveLogs();
+    void logPortError(QSerialPort::SerialPortError);
 
     void processDisconnectState();
     void processConnectState();

@@ -131,7 +131,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTextBrowser" name="logsBrowser"/>
+      <widget class="QTextEdit" name="logsEdit"/>
      </item>
     </layout>
    </widget>
