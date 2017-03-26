@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_stateMachine(this)
 {
     ui->setupUi(this);
+    ui->actionShow_Logs->setCheckable(true);
+    ui->actionShow_Logs->setChecked(true);
     ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     ui->mainToolBar->addAction( ui->actionStart );
     ui->mainToolBar->addAction( ui->actionStop );
@@ -31,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionConfigure_Port, &QAction::triggered, this, &MainWindow::configurePort);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
+    connect(ui->actionShow_Logs, &QAction::triggered, ui->logsDockWidget, &QDockWidget::setVisible);
 }
 
 MainWindow::~MainWindow()
@@ -55,6 +58,9 @@ void MainWindow::initIcons()
     playOptions["color-active"] = QColor(Qt::red);
     playOptions["color-selected"] = QColor(Qt::red);
     ui->actionStop->setIcon(QtAwesome::instance()->icon(fa::stopcircleo, stopOptions));
+
+    ui->saveLogsButton->setIcon(QtAwesome::instance()->icon(fa::save));
+    ui->clearLogsButton->setIcon(QtAwesome::instance()->icon(fa::eraser));
 }
 
 void MainWindow::initStateMachine()
