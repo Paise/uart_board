@@ -19,6 +19,7 @@ public:
     ~MainWindow();
 
 private:
+    void initIcons();
     void initStateMachine();
 
     Ui::MainWindow *ui;
@@ -29,8 +30,6 @@ private:
 private slots:
     void about();
     void sendData();
-    void startMessaging();
-    void stopMessaging();
     void configurePort();
     void connectPort();
     void disconnectPort();
@@ -38,6 +37,7 @@ private slots:
     void processDisconnectState();
     void processConnectState();
     void processRunningState();
+    void processStop();
 
 signals:
     void portOpened();

@@ -3,9 +3,10 @@
 #include "ui_about.h"
 #include "configuredialog.h"
 #include "customstatusbar.h"
+#include "ext/QtAwesome/QtAwesome.h"
 #include <QDebug>
 #include <QState>
-#include <QPainter>
+#include <QStyle>
 
 #define SEND_PERIOD (1000)
 
@@ -17,11 +18,13 @@ MainWindow::MainWindow(QWidget *parent) :
     m_stateMachine(this)
 {
     ui->setupUi(this);
+    ui->mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     ui->mainToolBar->addAction( ui->actionStart );
     ui->mainToolBar->addAction( ui->actionStop );
     ui->mainToolBar->addAction( ui->actionDisconnect );
     m_sendTimer.setInterval(SEND_PERIOD);
 
+    initIcons();
     initStateMachine();
 
     connect(&m_sendTimer, &QTimer::timeout, this, &MainWindow::sendData);
@@ -34,6 +37,24 @@ MainWindow::~MainWindow()
 {
     disconnectPort();
     delete ui;
+}
+
+void MainWindow::initIcons()
+{
+    ui->actionConfigure_Port->setIcon(QtAwesome::instance()->icon(fa::cog));
+    ui->actionDisconnect->setIcon(QtAwesome::instance()->icon(fa::unlink));
+    ui->actionLoad->setIcon(QtAwesome::instance()->icon(fa::folderopeno));
+    ui->actionSave->setIcon(QtAwesome::instance()->icon(fa::save));
+    QVariantMap playOptions;
+    playOptions["color"] = QColor(Qt::green);
+    playOptions["color-active"] = QColor(Qt::green);
+    playOptions["color-selected"] = QColor(Qt::green);
+    ui->actionStart->setIcon(QtAwesome::instance()->icon(fa::playcircleo, playOptions));
+    QVariantMap stopOptions;
+    stopOptions["color"] = QColor(Qt::red);
+    playOptions["color-active"] = QColor(Qt::red);
+    playOptions["color-selected"] = QColor(Qt::red);
+    ui->actionStop->setIcon(QtAwesome::instance()->icon(fa::stopcircleo, stopOptions));
 }
 
 void MainWindow::initStateMachine()
@@ -72,7 +93,7 @@ void MainWindow::initStateMachine()
     connect(stateDisconnected, &QState::entered, this, &MainWindow::processDisconnectState);
     connect(stateConnected, &QState::entered, this, &MainWindow::processConnectState);
     connect(stateRunnig, &QState::entered, this, &MainWindow::processRunningState);
-    connect(stateRunnig, &QState::exited, this, &MainWindow::stopMessaging);
+    connect(stateRunnig, &QState::exited, this, &MainWindow::processStop);
 
     m_stateMachine.addState(stateDisconnected);
     m_stateMachine.addState(stateConnected);
@@ -93,16 +114,6 @@ void MainWindow::about()
 void MainWindow::sendData()
 {
     m_serial.write("hell", 4);
-}
-
-void MainWindow::startMessaging()
-{
-    m_sendTimer.start();
-}
-
-void MainWindow::stopMessaging()
-{
-    m_sendTimer.stop();
 }
 
 void MainWindow::configurePort()
@@ -146,6 +157,11 @@ void MainWindow::processConnectState()
 
 void MainWindow::processRunningState()
 {
-    startMessaging();
+    m_sendTimer.start();
     ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial.portName()));
+}
+
+void MainWindow::processStop()
+{
+    m_sendTimer.stop();
 }

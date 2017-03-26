@@ -24,3 +24,7 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     configuredialog.ui \
     about.ui
+
+RESOURCES +=
+
+include(ext/QtAwesome/QtAwesome.pri)
