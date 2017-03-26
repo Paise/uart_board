@@ -25,7 +25,8 @@ HEADERS  += mainwindow.h \
     customstatusbar.h \
     messagelogger.h \
     rawdatasendwidget.h \
-    serialportholder.h
+    serialportholder.h \
+    iserialio.h
 
 FORMS    += mainwindow.ui \
     configuredialog.ui \

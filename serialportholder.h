@@ -1,10 +1,11 @@
 #ifndef SERIALPORT_HOLDER_H
 #define SERIALPORT_HOLDER_H
 
+#include "abstractserialio.h"
 #include <QSerialPort>
 #include <QPointer>
 
-class SerialPortHolder : public QObject
+class SerialPortHolder : public ISerialIO
 {
     Q_OBJECT
 public:
@@ -29,8 +30,6 @@ signals:
     void closed();
     void opened();
     void errorOccured(const QString &msg, QSerialPort::SerialPortError);
-    void dataRecieved(const QByteArray &data);
-    void dataWritten(qint64 bytes);
 
 };
 
