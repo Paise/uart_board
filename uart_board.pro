@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     configuredialog.cpp \
     customstatusbar.cpp \
-    messagelogger.cpp
+    messagelogger.cpp \
+    customserialport.cpp
 
 HEADERS  += mainwindow.h \
     configuredialog.h \
     customstatusbar.h \
-    messagelogger.h
+    messagelogger.h \
+    customserialport.h
 
 FORMS    += mainwindow.ui \
     configuredialog.ui \
