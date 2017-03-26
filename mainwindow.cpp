@@ -4,7 +4,7 @@
 #include "messagelogger.h"
 #include "configuredialog.h"
 #include "customstatusbar.h"
-#include "customserialport.h"
+#include "serialportholder.h"
 #include "ext/QtAwesome/QtAwesome.h"
 #include <QDebug>
 #include <QState>
@@ -16,7 +16,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_serial(new CustomSerialPort(this)),
+    m_serial(new SerialPortHolder(new QSerialPort, this)),
     m_stateMachine(this)
 {
     ui->setupUi(this);
@@ -112,14 +112,14 @@ void MainWindow::initStateMachine()
     stateRunnig->assignProperty(ui->actionConfigure_Port, "enabled", false);
     stateRunnig->assignProperty(ui->statusBar, "statusColor", QColor(Qt::green));
 
-    stateDisconnected->addTransition(m_serial, SIGNAL(portOpened()), stateConnected);
+    stateDisconnected->addTransition(m_serial, SIGNAL(opened()), stateConnected);
     stateConnected->addTransition(ui->actionStart, SIGNAL(triggered()), stateRunnig);
     stateConnected->addTransition(ui->actionDisconnect, SIGNAL(triggered()), stateDisconnected);
-    stateConnected->addTransition(m_serial, SIGNAL(aboutToClose()), stateDisconnected);
-    stateConnected->addTransition(m_serial, SIGNAL(error(QSerialPort::SerialPortError)), stateDisconnected);
+    stateConnected->addTransition(m_serial, SIGNAL(closed()), stateDisconnected);
+    stateConnected->addTransition(m_serial, SIGNAL(errorOccured(const QString &, QSerialPort::SerialPortError)), stateDisconnected);
     stateRunnig->addTransition(ui->actionStop, SIGNAL(triggered()), stateConnected);
-    stateRunnig->addTransition(m_serial, SIGNAL(aboutToClose()), stateDisconnected);
-    stateRunnig->addTransition(m_serial, SIGNAL(error(QSerialPort::SerialPortError)), stateDisconnected);
+    stateRunnig->addTransition(m_serial, SIGNAL(closed()), stateDisconnected);
+    stateRunnig->addTransition(m_serial, SIGNAL(errorOccured(const QString &, QSerialPort::SerialPortError)), stateDisconnected);
 
     connect(stateDisconnected, &QState::entered, this, &MainWindow::processDisconnectState);
     connect(stateConnected, &QState::entered, this, &MainWindow::processConnectState);
@@ -164,12 +164,12 @@ void MainWindow::configurePort()
 
     if (dialog.exec() == QDialog::Accepted) {
         m_serial->disconnectPort();
-        m_serial->setPortName( dialog.portName() );
-        m_serial->setBaudRate( dialog.baudRate() );
-        m_serial->setDataBits( dialog.dataBits() );
-        m_serial->setParity( dialog.parity() );
-        m_serial->setStopBits( dialog.stopBits() );
-        m_serial->setFlowControl( dialog.flowControl() );
+        m_serial->serialPort()->setPortName( dialog.portName() );
+        m_serial->serialPort()->setBaudRate( dialog.baudRate() );
+        m_serial->serialPort()->setDataBits( dialog.dataBits() );
+        m_serial->serialPort()->setParity( dialog.parity() );
+        m_serial->serialPort()->setStopBits( dialog.stopBits() );
+        m_serial->serialPort()->setFlowControl( dialog.flowControl() );
         m_serial->connectPort();
     }
 }
@@ -182,12 +182,12 @@ void MainWindow::processDisconnectState()
 
 void MainWindow::processConnectState()
 {
-    ui->statusBar->setPermanentMessage(tr("Connected to %0").arg(m_serial->portName()));
+    ui->statusBar->setPermanentMessage(tr("Connected to %0").arg(m_serial->serialPort()->portName()));
 }
 
 void MainWindow::processRunningState()
 {
-    ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial->portName()));
+    ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial->serialPort()->portName()));
     qDebug() << tr("Start messaging");
 }
 

@@ -6,6 +6,8 @@ RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     ui(new Ui::RawDataSendWidget)
 {
     ui->setupUi(this);
+    ui->asciiRadio->setChecked(true);
+    ui->readEdit->setReadOnly(true);
 }
 
 RawDataSendWidget::~RawDataSendWidget()

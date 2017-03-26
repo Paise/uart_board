@@ -17,17 +17,20 @@ SOURCES += main.cpp\
     configuredialog.cpp \
     customstatusbar.cpp \
     messagelogger.cpp \
-    customserialport.cpp
+    rawdatasendwidget.cpp \
+    serialportholder.cpp
 
 HEADERS  += mainwindow.h \
     configuredialog.h \
     customstatusbar.h \
     messagelogger.h \
-    customserialport.h
+    rawdatasendwidget.h \
+    serialportholder.h
 
 FORMS    += mainwindow.ui \
     configuredialog.ui \
-    about.ui
+    about.ui \
+    rawdatasendwidget.ui
 
 RESOURCES +=
 

@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QStateMachine>
 
-class CustomSerialPort;
+class SerialPortHolder;
 namespace Ui {
 class MainWindow;
 }
@@ -24,7 +24,7 @@ private:
     void initStateMachine();
 
     Ui::MainWindow *ui;
-    CustomSerialPort *m_serial;
+    SerialPortHolder *m_serial;
     QStateMachine m_stateMachine;
 
 private slots:

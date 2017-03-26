@@ -20,6 +20,11 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <widget class="RawDataSendWidget" name="rawTab">
+       <attribute name="title">
+        <string>Raw Sending</string>
+       </attribute>
+      </widget>
       <widget class="QWidget" name="stepperTab">
        <attribute name="title">
         <string>Stepper Motor</string>
@@ -188,6 +193,12 @@
    <class>CustomStatusBar</class>
    <extends>QStatusBar</extends>
    <header>customstatusbar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RawDataSendWidget</class>
+   <extends>QWidget</extends>
+   <header>rawdatasendwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
