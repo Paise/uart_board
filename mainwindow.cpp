@@ -9,6 +9,7 @@
 #include <QState>
 #include <QStyle>
 #include <QFileDialog>
+#include <QStandardPaths>
 
 #define SEND_PERIOD (1000)
 
@@ -162,7 +163,9 @@ void MainWindow::disconnectPort()
 
 void MainWindow::saveLogs()
 {
-    QString filename = QFileDialog::getSaveFileName(this, tr("Select a File"));
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("Select a File"),
+                                                    QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
     QFile logsFile(filename);
 
     if (!logsFile.open(QFile::WriteOnly)) {
@@ -171,6 +174,7 @@ void MainWindow::saveLogs()
     }
     logsFile.write(ui->logsEdit->toPlainText().toStdString().c_str());
     logsFile.close();
+    qDebug() << tr("Log succesfully saved to %0").arg(filename);
 }
 
 void MainWindow::logPortError(QSerialPort::SerialPortError error)

@@ -12,7 +12,7 @@ void MessageLogger::setOutWidget(QTextEdit *edit)
     m_edit = edit;
 }
 
-void MessageLogger::log(const QByteArray &message)
+void MessageLogger::log(const QString &message)
 {
     if (m_edit.isNull()) {
         return;

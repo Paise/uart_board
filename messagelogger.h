@@ -12,7 +12,7 @@ public:
     explicit MessageLogger(QObject *parent = 0);
 
     void setOutWidget(QTextEdit *edit);
-    void log(const QByteArray &message);
+    void log(const QString &message);
     static MessageLogger* instance();
 
 private:

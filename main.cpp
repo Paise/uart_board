@@ -1,13 +1,15 @@
 #include "mainwindow.h"
 #include "messagelogger.h"
 #include <QApplication>
+#include <QDateTime>
 #include <QtGlobal>
 
 void customMessageHandler(QtMsgType type, const QMessageLogContext &ctx, const QString &msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();
+    QString date = QDateTime::currentDateTime().toString("hh:mm:ss::zzz");
 
-    MessageLogger::instance()->log(localMsg);
+    MessageLogger::instance()->log(QString("%0: %1").arg(date, msg));
     switch(type) {
     case QtDebugMsg:
         fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), ctx.file, ctx.line, ctx.function);
