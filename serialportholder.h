@@ -1,7 +1,7 @@
 #ifndef SERIALPORT_HOLDER_H
 #define SERIALPORT_HOLDER_H
 
-#include "abstractserialio.h"
+#include "iserialio.h"
 #include <QSerialPort>
 #include <QPointer>
 

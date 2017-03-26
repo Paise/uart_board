@@ -3,7 +3,7 @@
 #include <QDebug>
 
 SerialPortHolder::SerialPortHolder(QSerialPort *serial, QObject *parent) :
-    AbstractSerialIO(parent),
+    ISerialIO(parent),
     m_serialPort(serial)
 {
     m_serialPort->setParent(this);
