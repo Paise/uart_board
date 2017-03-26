@@ -1,7 +1,9 @@
 #include "rawdatasendwidget.h"
 #include "ui_rawdatasendwidget.h"
 #include "iserialio.h"
+#include "ext/QtAwesome/QtAwesome.h"
 #include <QDebug>
+#include <QTextCursor>
 
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     QWidget(parent),
@@ -10,8 +12,12 @@ RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->asciiRadio->setChecked(true);
     ui->readEdit->setReadOnly(true);
+    ui->clearWriteButton->setIcon(QtAwesome::instance()->icon(fa::trasho));
+    ui->clearReadButton->setIcon(QtAwesome::instance()->icon(fa::trasho));
 
     connect(ui->sendButton, &QPushButton::clicked, this, &RawDataSendWidget::sendData);
+    connect(ui->clearWriteButton, &QPushButton::clicked, ui->writeEdit, &QPlainTextEdit::clear);
+    connect(ui->clearReadButton, &QPushButton::clicked, ui->readEdit, &QPlainTextEdit::clear);
 }
 
 RawDataSendWidget::~RawDataSendWidget()

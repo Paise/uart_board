@@ -23,7 +23,7 @@ private:
     Ui::RawDataSendWidget *ui;
     QPointer<ISerialIO> m_serial;
 
-private:
+private slots:
     void sendData();
     void recieveData(const QByteArray &data);
 };

@@ -87,7 +87,7 @@ void MainWindow::initIcons()
     ui->actionStop->setIcon(QtAwesome::instance()->icon(fa::stopcircleo, stopOptions));
 
     ui->saveLogsButton->setIcon(QtAwesome::instance()->icon(fa::save));
-    ui->clearLogsButton->setIcon(QtAwesome::instance()->icon(fa::eraser));
+    ui->clearLogsButton->setIcon(QtAwesome::instance()->icon(fa::trasho));
 }
 
 void MainWindow::initStateMachine()
