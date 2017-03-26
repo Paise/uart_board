@@ -1,5 +1,4 @@
 #include "serialportholder.h"
-#include "messagelogger.h"
 #include <QDebug>
 
 SerialPortHolder::SerialPortHolder(QSerialPort *serial, QObject *parent) :

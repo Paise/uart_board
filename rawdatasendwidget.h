@@ -2,7 +2,9 @@
 #define RAWDATASENDWIDGET_H
 
 #include <QWidget>
+#include <QPointer>
 
+class ISerialIO;
 namespace Ui {
 class RawDataSendWidget;
 }
@@ -15,8 +17,15 @@ public:
     explicit RawDataSendWidget(QWidget *parent = 0);
     ~RawDataSendWidget();
 
+    void setSerialDevice(ISerialIO *serial);
+
 private:
     Ui::RawDataSendWidget *ui;
+    QPointer<ISerialIO> m_serial;
+
+private:
+    void sendData();
+    void recieveData(const QByteArray &data);
 };
 
 #endif // RAWDATASENDWIDGET_H

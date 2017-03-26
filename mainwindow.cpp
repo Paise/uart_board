@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction( ui->actionStart );
     ui->mainToolBar->addAction( ui->actionStop );
     ui->mainToolBar->addAction( ui->actionDisconnect );
+    ui->rawTab->setSerialDevice(m_serial);
 
     MessageLogger::instance()->setOutWidget(ui->logsEdit);
     initIcons();
