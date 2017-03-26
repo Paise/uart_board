@@ -32,7 +32,10 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
 
-    w.setWindowTitle("Uart Board");
+    QCoreApplication::setApplicationName(APPLICATION_NAME);
+    QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
+    QCoreApplication::setApplicationVersion(APPLICATION_VERSION);
+    w.setWindowTitle(APPLICATION_NAME);
     w.show();
 
     return a.exec();

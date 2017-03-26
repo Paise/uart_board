@@ -30,3 +30,9 @@ FORMS    += mainwindow.ui \
 RESOURCES +=
 
 include(ext/QtAwesome/QtAwesome.pri)
+
+#Target version
+VERSION = 0.0.1
+DEFINES += APPLICATION_VERSION=\\\"$$VERSION\\\"
+DEFINES += ORGANIZATION_NAME=\\\"SPbSPU\\\"
+DEFINES += APPLICATION_NAME=\\\"UartBoard\\\"

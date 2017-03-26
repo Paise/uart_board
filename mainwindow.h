@@ -19,6 +19,8 @@ public:
     ~MainWindow();
 
 private:
+    void showEvent(QShowEvent *);
+    void closeEvent(QCloseEvent *);
     void initIcons();
     void initStateMachine();
 

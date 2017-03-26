@@ -10,6 +10,7 @@
 #include <QStyle>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QSettings>
 
 #define SEND_PERIOD (1000)
 
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
     connect(ui->actionShow_Logs, &QAction::triggered, ui->logsDockWidget, &QDockWidget::setVisible);
+    connect(ui->logsDockWidget, &QDockWidget::visibilityChanged, ui->actionShow_Logs, &QAction::setChecked);
     connect(ui->saveLogsButton, &QPushButton::clicked, this, &MainWindow::saveLogs);
     connect(ui->clearLogsButton, &QPushButton::clicked, ui->logsEdit, &QTextEdit::clear);
 }
@@ -48,6 +50,26 @@ MainWindow::~MainWindow()
 {
     disconnectPort();
     delete ui;
+}
+
+void MainWindow::showEvent(QShowEvent *)
+{
+    QSettings settings;
+
+    settings.beginGroup("MainWindow");
+    this->restoreGeometry(settings.value("geometry").toByteArray());
+    this->restoreState(settings.value("state").toByteArray());
+    settings.endGroup();
+}
+
+void MainWindow::closeEvent(QCloseEvent *)
+{
+    QSettings settings;
+
+    settings.beginGroup("MainWindow");
+    settings.setValue("geometry", this->saveGeometry());
+    settings.setValue("state", this->saveState());
+    settings.endGroup();
 }
 
 void MainWindow::initIcons()
