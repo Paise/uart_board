@@ -25,6 +25,7 @@ private:
 
 private slots:
     void sendData();
+    void enableSendButton(const QString &text);
     void recieveData(const QByteArray &data);
 };
 
