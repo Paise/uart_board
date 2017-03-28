@@ -12,26 +12,29 @@ TARGET = uart_board
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    configuredialog.cpp \
-    customstatusbar.cpp \
-    messagelogger.cpp \
-    rawdatasendwidget.cpp \
-    serialportholder.cpp
+SOURCES += \
+    src/configuredialog.cpp \
+    src/customstatusbar.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/messagelogger.cpp \
+    src/rawdatasendwidget.cpp \
+    src/serialportholder.cpp
 
-HEADERS  += mainwindow.h \
-    configuredialog.h \
-    customstatusbar.h \
-    messagelogger.h \
-    rawdatasendwidget.h \
-    serialportholder.h \
-    iserialio.h
+HEADERS  += \
+    src/configuredialog.h \
+    src/customstatusbar.h \
+    src/iserialio.h \
+    src/mainwindow.h \
+    src/messagelogger.h \
+    src/rawdatasendwidget.h \
+    src/serialportholder.h
 
-FORMS    += mainwindow.ui \
-    configuredialog.ui \
-    about.ui \
-    rawdatasendwidget.ui
+FORMS    += \
+    ui/about.ui \
+    ui/configuredialog.ui \
+    ui/mainwindow.ui \
+    ui/rawdatasendwidget.ui
 
 RESOURCES +=
 
