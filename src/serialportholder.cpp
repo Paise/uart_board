@@ -21,7 +21,25 @@ QSerialPort *SerialPortHolder::serialPort()
 void SerialPortHolder::writeAsync(const QByteArray &data)
 {
     m_serialPort->write(data);
-    qDebug() << tr("Data to send: %0").arg(QString(data));
+    qDebug() << tr("Data to send:");
+    for (int i = 0; i < data.size(); ++i) {
+        qDebug() << (quint8) data[i];
+    }
+}
+
+void SerialPortHolder::writeAsyncByte(quint8 byte)
+{
+    QByteArray d;
+    d.append((char) byte);
+    writeAsync(d);
+}
+
+void SerialPortHolder::writeAsync2Bytes(quint16 byte)
+{
+    QByteArray d;
+    d.append((char) byte);
+    d.append((char) (byte >> 8));
+    writeAsync(d);
 }
 
 void SerialPortHolder::connectPort(const QString &name)
@@ -51,7 +69,10 @@ void SerialPortHolder::confirmDataWritten(quint64 bytes)
 void SerialPortHolder::recieveData()
 {
     QByteArray data = m_serialPort->readAll();
-    qDebug() << tr("Data recieved: %0").arg(QString(data));
+    qDebug() << tr("Data recieved:");
+    for (int i = 0; i < data.size(); ++i) {
+        qDebug() << (quint8) data[i];
+    }
     emit dataRecieved(data);
 }
 

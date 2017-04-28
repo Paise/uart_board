@@ -12,6 +12,8 @@ public:
     virtual ~ISerialIO() {}
 
     virtual void writeAsync(const QByteArray &data) =0;
+    virtual void writeAsyncByte(quint8 byte) =0;
+    virtual void writeAsync2Bytes(quint16 bytes) =0;
 
 signals:
     void dataRecieved(const QByteArray &data);

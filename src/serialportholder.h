@@ -13,6 +13,8 @@ public:
 
     QSerialPort* serialPort();
     void writeAsync(const QByteArray &data);
+    void writeAsyncByte(quint8 byte);
+    void writeAsync2Bytes(quint16 bytes);
 
 private:
     QPointer<QSerialPort> m_serialPort;

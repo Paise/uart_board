@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = uart_board
 TEMPLATE = app
 
+INCLUDEPATH += \
+    src/
 
 SOURCES += \
     src/configuredialog.cpp \

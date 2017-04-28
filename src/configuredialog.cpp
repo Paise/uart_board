@@ -124,7 +124,7 @@ void ConfigureDialog::initDefaults()
     ui->baudRateBox->setCurrentIndex(3);
     ui->dataBitsBox->setCurrentIndex(3);
     ui->parityBox->setCurrentIndex(0);
-    ui->stopBitsBox->setCurrentIndex(1);
+    ui->stopBitsBox->setCurrentIndex(0);
     ui->flowControlBox->setCurrentIndex(0);
 }
 

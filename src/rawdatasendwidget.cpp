@@ -7,10 +7,11 @@
 
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::RawDataSendWidget)
+    ui(new Ui::RawDataSendWidget),
+    m_intValidator(new QIntValidator(0, 0xFFFF, this)),
+    m_hexValidator(new QRegExpValidator(QRegExp("(\\d|[a-f])*"), this))
 {
     ui->setupUi(this);
-    ui->asciiRadio->setChecked(true);
     ui->writeEdit->setReadOnly(true);
     ui->readEdit->setReadOnly(true);
     ui->clearWriteButton->setIcon(QtAwesome::instance()->icon(fa::trasho));
@@ -21,6 +22,10 @@ RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     connect(ui->toSendLineEdit, &QLineEdit::textChanged, this, &RawDataSendWidget::enableSendButton);
     connect(ui->clearWriteButton, &QPushButton::clicked, ui->writeEdit, &QPlainTextEdit::clear);
     connect(ui->clearReadButton, &QPushButton::clicked, ui->readEdit, &QPlainTextEdit::clear);
+    connect(ui->asciiRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setAsciiValidator);
+    connect(ui->decRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setIntValidator);
+    connect(ui->hexRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setHexValidator);
+    ui->asciiRadio->setChecked(true);
 }
 
 RawDataSendWidget::~RawDataSendWidget()
@@ -37,6 +42,24 @@ void RawDataSendWidget::setSerialDevice(ISerialIO *serial)
     connect(serial, &ISerialIO::dataRecieved, this, &RawDataSendWidget::recieveData);
 }
 
+QString RawDataSendWidget::toCurrentEncoding(const QByteArray &data)
+{
+    QString text;
+
+    if (ui->asciiRadio->isChecked()) {
+        text = QString("|ascii\t|") + QString::fromUtf8(data);
+    } else if (ui->decRadio->isChecked()) {
+        QString hex(data.toHex());
+        bool ok;
+        // TODO: split long hex array to 2-bytes
+        text = QString("|dec\t|%0").arg(hex.toInt(&ok, 16));
+    } else {
+        text = QString("|0x\t|") + QString(data.toHex());
+    }
+
+    return text;
+}
+
 void RawDataSendWidget::sendData()
 {
     if (m_serial.isNull()) {
@@ -48,7 +71,14 @@ void RawDataSendWidget::sendData()
     if (text.isEmpty()) {
         return;
     }
-    m_serial->writeAsync(text.toUtf8());
+    if (ui->asciiRadio->isChecked()) {
+        m_serial->writeAsync(text.toUtf8());
+    } else if (ui->decRadio->isChecked()) {
+        m_serial->writeAsync2Bytes(text.toInt());
+    } else {
+        bool ok;
+        m_serial->writeAsync2Bytes(text.toInt(&ok, 16));
+    }
     ui->writeEdit->insertPlainText(text.append('\n'));
 }
 
@@ -59,5 +89,23 @@ void RawDataSendWidget::enableSendButton(const QString &text)
 
 void RawDataSendWidget::recieveData(const QByteArray &data)
 {
-    ui->readEdit->appendPlainText(QString(data));
+    ui->readEdit->appendPlainText(toCurrentEncoding(data));
+}
+
+void RawDataSendWidget::setIntValidator()
+{
+    ui->toSendLineEdit->setValidator(m_intValidator);
+    qDebug() << tr("Switched to decimal");
+}
+
+void RawDataSendWidget::setHexValidator()
+{
+    ui->toSendLineEdit->setValidator(m_hexValidator);
+    qDebug() << tr("Switched to hex");
+}
+
+void RawDataSendWidget::setAsciiValidator()
+{
+    ui->toSendLineEdit->setValidator(NULL);
+    qDebug() << tr("Switched to ascii");
 }
