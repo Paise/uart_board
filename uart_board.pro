@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport
+QT       += core gui serialport charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -21,7 +21,8 @@ SOURCES += \
     src/mainwindow.cpp \
     src/messagelogger.cpp \
     src/rawdatasendwidget.cpp \
-    src/serialportholder.cpp
+    src/serialportholder.cpp \
+    src/dcmotorwidget.cpp
 
 HEADERS  += \
     src/configuredialog.h \
@@ -30,13 +31,15 @@ HEADERS  += \
     src/mainwindow.h \
     src/messagelogger.h \
     src/rawdatasendwidget.h \
-    src/serialportholder.h
+    src/serialportholder.h \
+    src/dcmotorwidget.h
 
 FORMS    += \
     ui/about.ui \
     ui/configuredialog.ui \
     ui/mainwindow.ui \
-    ui/rawdatasendwidget.ui
+    ui/rawdatasendwidget.ui \
+    ui/dcmotorwidget.ui
 
 RESOURCES +=
 

@@ -18,19 +18,14 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="RawDataSendWidget" name="rawTab">
        <attribute name="title">
         <string>Raw Sending</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="stepperTab">
-       <attribute name="title">
-        <string>Stepper Motor</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="DCTab">
+      <widget class="DCMotorWidget" name="DCTab">
        <attribute name="title">
         <string>DC Motor</string>
        </attribute>
@@ -201,6 +196,12 @@
    <class>RawDataSendWidget</class>
    <extends>QWidget</extends>
    <header>rawdatasendwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DCMotorWidget</class>
+   <extends>QWidget</extends>
+   <header>dcmotorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
