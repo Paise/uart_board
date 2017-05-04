@@ -5,6 +5,7 @@
 #include "configuredialog.h"
 #include "customstatusbar.h"
 #include "serialportholder.h"
+#include "irunnablewidget.h"
 #include "ext/QtAwesome/QtAwesome.h"
 #include <QDebug>
 #include <QState>
@@ -193,10 +194,14 @@ void MainWindow::processConnectState()
 void MainWindow::processRunningState()
 {
     ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial->serialPort()->portName()));
+    IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
+    if (currentWidget) currentWidget->run();
     qDebug() << tr("Start messaging");
 }
 
 void MainWindow::processStop()
 {
+    IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
+    if (currentWidget) currentWidget->stop();
     qDebug() << tr("Stop messaging");
 }

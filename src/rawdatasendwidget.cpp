@@ -6,7 +6,7 @@
 #include <QTextCursor>
 
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
-    QWidget(parent),
+    IRunnableWidget(parent),
     ui(new Ui::RawDataSendWidget),
     m_intValidator(new QIntValidator(0, 0xFFFF, this)),
     m_hexValidator(new QRegExpValidator(QRegExp("(\\d|[a-f])*"), this))
@@ -58,6 +58,16 @@ QString RawDataSendWidget::toCurrentEncoding(const QByteArray &data)
     }
 
     return text;
+}
+
+void RawDataSendWidget::run()
+{
+    // Do nothing
+}
+
+void RawDataSendWidget::stop()
+{
+    // Do nothing
 }
 
 void RawDataSendWidget::sendData()

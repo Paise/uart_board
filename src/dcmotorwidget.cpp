@@ -12,7 +12,7 @@ using namespace QtCharts;
 #define INIT_INTERVAL (200)
 
 DCMotorWidget::DCMotorWidget(QWidget *parent) :
-    QWidget(parent),
+    IRunnableWidget(parent),
     ui(new Ui::DCMotorWidget),
     m_chart(new QChart),
     m_series(new QLineSeries),
@@ -71,6 +71,16 @@ bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
     m_selected = next;
     e->accept();
     return true;
+}
+
+void DCMotorWidget::run()
+{
+
+}
+
+void DCMotorWidget::stop()
+{
+
 }
 
 void DCMotorWidget::addPoint(const QPointF &point)

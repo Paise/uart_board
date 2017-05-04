@@ -1,14 +1,14 @@
 #ifndef DCMOTORWIDGET_H
 #define DCMOTORWIDGET_H
 
-#include <QWidget>
+#include "irunnablewidget.h"
 #include <QtCharts>
 
 namespace Ui {
 class DCMotorWidget;
 }
 
-class DCMotorWidget : public QWidget
+class DCMotorWidget : public IRunnableWidget
 {
     Q_OBJECT
 
@@ -32,6 +32,10 @@ private:
     QLineSeries *m_series;
     QScatterSeries *m_scatter;
     QPointF m_selected;
+
+public slots:
+    void run();
+    void stop();
 
 private slots:
     void addPoint(const QPointF &);

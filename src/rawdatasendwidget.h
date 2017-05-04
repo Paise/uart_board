@@ -1,7 +1,7 @@
 #ifndef RAWDATASENDWIDGET_H
 #define RAWDATASENDWIDGET_H
 
-#include <QWidget>
+#include "irunnablewidget.h"
 #include <QPointer>
 #include <QIntValidator>
 #include <QRegExpValidator>
@@ -11,7 +11,7 @@ namespace Ui {
 class RawDataSendWidget;
 }
 
-class RawDataSendWidget : public QWidget
+class RawDataSendWidget : public IRunnableWidget
 {
     Q_OBJECT
 
@@ -28,6 +28,10 @@ private:
     QPointer<ISerialIO> m_serial;
     QIntValidator *m_intValidator;
     QRegExpValidator *m_hexValidator;
+
+public slots:
+    void run();
+    void stop();
 
 private slots:
     void sendData();

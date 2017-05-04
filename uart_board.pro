@@ -32,7 +32,8 @@ HEADERS  += \
     src/messagelogger.h \
     src/rawdatasendwidget.h \
     src/serialportholder.h \
-    src/dcmotorwidget.h
+    src/dcmotorwidget.h \
+    src/irunnablewidget.h
 
 FORMS    += \
     ui/about.ui \
