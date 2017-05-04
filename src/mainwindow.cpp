@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction( ui->actionDisconnect );
     ui->mainToolBar->addAction( ui->actionConfigure_Port );
     ui->rawTab->setSerialDevice(m_serial);
+    ui->DCTab->setSerialDevice(m_serial);
 
     MessageLogger::instance()->setOutWidget(ui->logsEdit);
     initIcons();
@@ -126,6 +127,8 @@ void MainWindow::initStateMachine()
     stateRunnig->addTransition(ui->actionStop, SIGNAL(triggered()), stateConnected);
     stateRunnig->addTransition(m_serial, SIGNAL(closed()), stateDisconnected);
     stateRunnig->addTransition(m_serial, SIGNAL(errorOccured(const QString &, QSerialPort::SerialPortError)), stateDisconnected);
+    stateRunnig->addTransition(ui->rawTab, SIGNAL(completed()), stateConnected);
+    stateRunnig->addTransition(ui->DCTab, SIGNAL(completed()), stateConnected);
 
     connect(stateDisconnected, &QState::entered, this, &MainWindow::processDisconnectState);
     connect(stateConnected, &QState::entered, this, &MainWindow::processConnectState);
@@ -193,15 +196,15 @@ void MainWindow::processConnectState()
 
 void MainWindow::processRunningState()
 {
+    qDebug() << tr("Start messaging");
     ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial->serialPort()->portName()));
     IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
     if (currentWidget) currentWidget->run();
-    qDebug() << tr("Start messaging");
 }
 
 void MainWindow::processStop()
 {
+    qDebug() << tr("Stop messaging");
     IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
     if (currentWidget) currentWidget->stop();
-    qDebug() << tr("Stop messaging");
 }

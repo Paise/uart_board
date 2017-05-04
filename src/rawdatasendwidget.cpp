@@ -62,7 +62,7 @@ QString RawDataSendWidget::toCurrentEncoding(const QByteArray &data)
 
 void RawDataSendWidget::run()
 {
-    // Do nothing
+    emit completed();
 }
 
 void RawDataSendWidget::stop()

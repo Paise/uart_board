@@ -4,6 +4,7 @@
 #include "irunnablewidget.h"
 #include <QtCharts>
 
+class DCVectorSender;
 namespace Ui {
 class DCMotorWidget;
 }
@@ -16,6 +17,7 @@ public:
     explicit DCMotorWidget(QWidget *parent = 0);
     ~DCMotorWidget();
 
+    void setSerialDevice(ISerialIO *serial);
     bool processChartMouseMove(QMouseEvent *e);
 
 private:
@@ -28,6 +30,7 @@ private:
     };
 
     Ui::DCMotorWidget *ui;
+    DCVectorSender *m_sender;
     QChart *m_chart;
     QLineSeries *m_series;
     QScatterSeries *m_scatter;

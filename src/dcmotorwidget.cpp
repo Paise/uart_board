@@ -1,5 +1,6 @@
 #include "dcmotorwidget.h"
 #include "ui_dcmotorwidget.h"
+#include "dcvectorsender.h"
 #include <QIntValidator>
 #include <QtMath>
 
@@ -14,6 +15,7 @@ using namespace QtCharts;
 DCMotorWidget::DCMotorWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCMotorWidget),
+    m_sender(nullptr),
     m_chart(new QChart),
     m_series(new QLineSeries),
     m_scatter(new QScatterSeries)
@@ -55,6 +57,14 @@ DCMotorWidget::~DCMotorWidget()
     delete ui;
 }
 
+void DCMotorWidget::setSerialDevice(ISerialIO *serial)
+{
+    if (m_sender) return;
+
+    m_sender = new DCVectorSender(serial, this);
+    connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::completed);
+}
+
 bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
 {
     if (m_selected.isNull()) return false;
@@ -75,12 +85,14 @@ bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
 
 void DCMotorWidget::run()
 {
-
+    if (!m_sender) return;
+    m_sender->start(m_scatter->points(), ui->intervalEdit->text().toInt());
 }
 
 void DCMotorWidget::stop()
 {
-
+    if (!m_sender) return;
+    m_sender->cancel();
 }
 
 void DCMotorWidget::addPoint(const QPointF &point)

@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#define COMMAND_CLEAR_SCREEN (0xFFC1)
+
 class ISerialIO : public QObject
 {
     Q_OBJECT
