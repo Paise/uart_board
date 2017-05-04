@@ -78,7 +78,6 @@ void DCMotorWidget::setSerialDevice(ISerialIO *serial)
     connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::clearScreen);
     connect(m_sender, &DCVectorSender::completed, m_listener, &DCResponseListener::cancel);
     connect(m_sender, &DCVectorSender::started, m_listener, &DCResponseListener::listen);
-    connect(m_sender, &DCVectorSender::interrupted, m_listener, &DCResponseListener::cancel);
     connect(m_sender, &DCVectorSender::sended, this, &DCMotorWidget::drawSendedPoint);
     connect(m_listener, &DCResponseListener::recieved, this, &DCMotorWidget::drawRecievedPoint);
 }
@@ -107,6 +106,7 @@ void DCMotorWidget::run()
     m_sender->start(m_scatter->points(), ui->intervalEdit->text().toInt());
     ui->intervalEdit->setEnabled(false);
     ui->intervalApplyButton->setEnabled(false);
+    m_chart->setEnabled(false);
 }
 
 void DCMotorWidget::stop()
@@ -115,6 +115,7 @@ void DCMotorWidget::stop()
     m_sender->cancel();
     ui->intervalEdit->setEnabled(true);
     ui->intervalApplyButton->setEnabled(true);
+    m_chart->setEnabled(true);
 }
 
 void DCMotorWidget::addPoint(const QPointF &point)

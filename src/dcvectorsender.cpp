@@ -10,13 +10,6 @@ DCVectorSender::DCVectorSender(ISerialIO *serial, QObject *parent) :
     connect(&m_timer, &QTimer::timeout, this, &DCVectorSender::sendNext);
 }
 
-void DCVectorSender::clear()
-{
-    m_currentIndex = 0;
-    m_points.clear();
-    m_timer.stop();
-}
-
 void DCVectorSender::start(QList<QPointF> points, int interval)
 {
     if (m_timer.isActive()) return;
@@ -33,8 +26,10 @@ void DCVectorSender::cancel()
 {
     if (!m_timer.isActive()) return;
 
-    clear();
-    emit interrupted();
+    m_currentIndex = 0;
+    m_points.clear();
+    m_timer.stop();
+    emit completed();
 }
 
 void DCVectorSender::sendNext()
@@ -43,7 +38,6 @@ void DCVectorSender::sendNext()
     m_serial->writeAsync2Bytes(val);
     emit sended(m_currentIndex, val);
     if (++m_currentIndex == m_points.count()) {
-        clear();
-        emit completed();
+        cancel();
     }
 }

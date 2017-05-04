@@ -14,8 +14,6 @@ public:
     explicit DCVectorSender(ISerialIO *serial, QObject *parent = 0);
 
 private:
-    void clear();
-
     ISerialIO *m_serial;
     QList<QPointF> m_points;
     QTimer m_timer;
@@ -25,7 +23,6 @@ signals:
     void sended(int index, quint16 val);
     void started();
     void completed();
-    void interrupted();
 
 public slots:
     void start(QList<QPointF> points, int interval);
