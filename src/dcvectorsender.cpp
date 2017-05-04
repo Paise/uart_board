@@ -41,7 +41,7 @@ void DCVectorSender::sendNext()
 {
     quint16 val = m_points.value(m_currentIndex).ry();
     m_serial->writeAsync2Bytes(val);
-    emit sended(m_currentIndex);
+    emit sended(m_currentIndex, val);
     if (++m_currentIndex == m_points.count()) {
         clear();
         emit completed();

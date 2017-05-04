@@ -20,7 +20,9 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     m_listener(nullptr),
     m_chart(new QChart),
     m_series(new QLineSeries),
-    m_scatter(new QScatterSeries)
+    m_recievedPoints(new QLineSeries),
+    m_scatter(new QScatterSeries),
+    m_sendedPoints(new QScatterSeries)
 {
     ui->setupUi(this);
 
@@ -34,12 +36,18 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     for (int i = 0; i < INIT_POINTS_COUNT; ++i) {
         addPoint(QPointF(i*INIT_INTERVAL,0));
     }
+    /* Series Settings */
+    m_scatter->setColor(Qt::green);
+    m_sendedPoints->setColor(Qt::red);
+    /* Chart Settings */
     m_chart->setTheme(QChart::ChartThemeDark);
     m_chart->legend()->hide();
     m_chart->addSeries(m_series);
+    m_chart->addSeries(m_recievedPoints);
     m_chart->addSeries(m_scatter);
+    m_chart->addSeries(m_sendedPoints);
     m_chart->createDefaultAxes();
-    /* Axes setting */
+    /* Axes Settings */
     QValueAxis *yAxis = qobject_cast<QValueAxis*>(m_chart->axisY());
     QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
     yAxis->setRange(0, 0xFFFF);
@@ -64,12 +72,15 @@ void DCMotorWidget::setSerialDevice(ISerialIO *serial)
     if (m_sender) return;
 
     m_sender = new DCVectorSender(serial, this);
-    connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::completed);
-
     m_listener = new DCResponseListener(serial, this);
+
+    connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::completed);
+    connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::clearScreen);
+    connect(m_sender, &DCVectorSender::completed, m_listener, &DCResponseListener::cancel);
     connect(m_sender, &DCVectorSender::started, m_listener, &DCResponseListener::listen);
     connect(m_sender, &DCVectorSender::interrupted, m_listener, &DCResponseListener::cancel);
-    connect(m_sender, &DCVectorSender::completed, m_listener, &DCResponseListener::cancel);
+    connect(m_sender, &DCVectorSender::sended, this, &DCMotorWidget::drawSendedPoint);
+    connect(m_listener, &DCResponseListener::recieved, this, &DCMotorWidget::drawRecievedPoint);
 }
 
 bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
@@ -141,11 +152,32 @@ void DCMotorWidget::resetXAxisRange()
 {
     int interval = ui->intervalEdit->text().toInt();
     m_chart->axisX()->setRange(0, (INIT_POINTS_COUNT-1)*interval);
+    QList<QPointF> points;
     for (int i = 0; i < m_scatter->points().count(); ++i) {
         QPointF oldP = m_scatter->at(i);
-        QPointF newP(i*interval, oldP.ry());
-        replacePoint(oldP, newP);
+        points << QPointF(i*interval, oldP.ry());
     }
+    m_series->clear();
+    m_scatter->clear();
+    m_series->append(points);
+    m_scatter->append(points);
+}
+
+void DCMotorWidget::drawRecievedPoint(int index, quint16 val)
+{
+    m_recievedPoints->append(index*ui->intervalEdit->text().toInt(), val);
+}
+
+void DCMotorWidget::drawSendedPoint(int index, quint16 val)
+{
+    m_sendedPoints->clear();
+    m_sendedPoints->append(index*ui->intervalEdit->text().toInt(), val);
+}
+
+void DCMotorWidget::clearScreen()
+{
+    m_recievedPoints->clear();
+    m_sendedPoints->clear();
 }
 
 DCMotorWidget::ChartView::ChartView(QChart *chart, DCMotorWidget *widget) :

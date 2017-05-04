@@ -22,7 +22,7 @@ private:
     uint32_t m_currentIndex;
 
 signals:
-    void sended(int index);
+    void sended(int index, quint16 val);
     void started();
     void completed();
     void interrupted();
