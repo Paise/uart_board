@@ -38,6 +38,7 @@ private slots:
     void replacePoint(const QPointF &oldp, const QPointF &newp);
     void selectPoint(const QPointF &);
     void releasePoint(const QPointF &);
+    void resetXAxisRange();
 };
 
 #endif // DCMOTORWIDGET_H
