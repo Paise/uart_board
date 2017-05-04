@@ -23,7 +23,8 @@ SOURCES += \
     src/rawdatasendwidget.cpp \
     src/serialportholder.cpp \
     src/dcmotorwidget.cpp \
-    src/dcvectorsender.cpp
+    src/dcvectorsender.cpp \
+    src/dcresponselistener.cpp
 
 HEADERS  += \
     src/configuredialog.h \
@@ -35,7 +36,8 @@ HEADERS  += \
     src/serialportholder.h \
     src/dcmotorwidget.h \
     src/irunnablewidget.h \
-    src/dcvectorsender.h
+    src/dcvectorsender.h \
+    src/dcresponselistener.h
 
 FORMS    += \
     ui/about.ui \

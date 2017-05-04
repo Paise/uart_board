@@ -26,6 +26,7 @@ void DCVectorSender::start(QList<QPointF> points, int interval)
     m_points = points;
     m_serial->writeAsync2Bytes(COMMAND_CLEAR_SCREEN);
     m_timer.start(interval);
+    emit started();
 }
 
 void DCVectorSender::cancel()

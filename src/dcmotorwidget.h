@@ -5,6 +5,7 @@
 #include <QtCharts>
 
 class DCVectorSender;
+class DCResponseListener;
 namespace Ui {
 class DCMotorWidget;
 }
@@ -31,6 +32,7 @@ private:
 
     Ui::DCMotorWidget *ui;
     DCVectorSender *m_sender;
+    DCResponseListener *m_listener;
     QChart *m_chart;
     QLineSeries *m_series;
     QScatterSeries *m_scatter;

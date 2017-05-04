@@ -1,6 +1,7 @@
 #include "dcmotorwidget.h"
 #include "ui_dcmotorwidget.h"
 #include "dcvectorsender.h"
+#include "dcresponselistener.h"
 #include <QIntValidator>
 #include <QtMath>
 
@@ -16,6 +17,7 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCMotorWidget),
     m_sender(nullptr),
+    m_listener(nullptr),
     m_chart(new QChart),
     m_series(new QLineSeries),
     m_scatter(new QScatterSeries)
@@ -63,6 +65,11 @@ void DCMotorWidget::setSerialDevice(ISerialIO *serial)
 
     m_sender = new DCVectorSender(serial, this);
     connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::completed);
+
+    m_listener = new DCResponseListener(serial, this);
+    connect(m_sender, &DCVectorSender::started, m_listener, &DCResponseListener::listen);
+    connect(m_sender, &DCVectorSender::interrupted, m_listener, &DCResponseListener::cancel);
+    connect(m_sender, &DCVectorSender::completed, m_listener, &DCResponseListener::cancel);
 }
 
 bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
@@ -87,12 +94,16 @@ void DCMotorWidget::run()
 {
     if (!m_sender) return;
     m_sender->start(m_scatter->points(), ui->intervalEdit->text().toInt());
+    ui->intervalEdit->setEnabled(false);
+    ui->intervalApplyButton->setEnabled(false);
 }
 
 void DCMotorWidget::stop()
 {
     if (!m_sender) return;
     m_sender->cancel();
+    ui->intervalEdit->setEnabled(true);
+    ui->intervalApplyButton->setEnabled(true);
 }
 
 void DCMotorWidget::addPoint(const QPointF &point)

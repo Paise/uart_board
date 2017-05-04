@@ -23,6 +23,7 @@ private:
 
 signals:
     void sended(int index);
+    void started();
     void completed();
     void interrupted();
 
