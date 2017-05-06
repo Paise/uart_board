@@ -22,6 +22,8 @@ public:
     bool processChartMouseMove(QMouseEvent *e);
 
 private:
+    QList<QPointF> pointsToSend();
+
     class ChartView : public QChartView {
     public:
         ChartView(QChart *chart, DCMotorWidget *widget);

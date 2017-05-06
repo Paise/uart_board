@@ -36,12 +36,15 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
 
     connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::applySettings);
 
+    m_series->clear();
+    m_scatter->clear();
     for (int i = 0; i < INIT_POINTS_COUNT; ++i) {
         addPoint(QPointF(i*INIT_INTERVAL,0));
     }
     /* Series Settings */
     m_scatter->setColor(Qt::green);
     m_sendedPoints->setColor(Qt::red);
+    m_recievedPoints->setColor(Qt::yellow);
     /* Chart Settings */
     m_chart->setTheme(QChart::ChartThemeDark);
     m_chart->legend()->hide();
@@ -105,10 +108,32 @@ bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
     return true;
 }
 
+QList<QPointF> DCMotorWidget::pointsToSend()
+{
+    QList<QPointF> points;
+    QList<QPointF> chartPoints = m_scatter->points();
+    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
+
+    for (auto p = chartPoints.begin(); p != chartPoints.end(); ++p) {
+        points << QPointF(*p);
+        if (p+1 == chartPoints.end()) break;
+
+        float mult = ((*(p+1)).ry() - (*p).ry()) / (xAxis->minorTickCount() + 1);
+        for (int i = 1; i <= xAxis->minorTickCount(); ++i) {
+            QPointF point;
+            point.setX(p->rx() + i*m_sendInterval);
+            point.setY(p->ry() + i*mult);
+            points << point;
+        }
+    }
+
+    return points;
+}
+
 void DCMotorWidget::run()
 {
     if (!m_sender) return;
-    m_sender->start(m_scatter->points(), m_sendInterval);
+    m_sender->start(pointsToSend(), m_sendInterval);
     ui->intervalEdit->setEnabled(false);
     ui->ticksEdit->setEnabled(false);
     ui->applyButton->setEnabled(false);

@@ -13,7 +13,10 @@ DCVectorSender::DCVectorSender(ISerialIO *serial, QObject *parent) :
 void DCVectorSender::start(QList<QPointF> points, int interval)
 {
     if (m_timer.isActive()) return;
-    if (points.isEmpty()) return;
+    if (points.isEmpty()) {
+        emit completed();
+        return;
+    }
 
     m_currentIndex = 0;
     m_points = points;
