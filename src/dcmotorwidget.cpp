@@ -35,6 +35,7 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     ui->ticksEdit->setText(QString("0"));
 
     connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::applySettings);
+    connect(ui->clearButton, &QPushButton::clicked, this, &DCMotorWidget::clearScreen);
 
     m_series->clear();
     m_scatter->clear();
@@ -83,7 +84,6 @@ void DCMotorWidget::setSerialDevice(ISerialIO *serial)
     m_listener = new DCResponseListener(serial, this);
 
     connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::completed);
-    connect(m_sender, &DCVectorSender::completed, this, &DCMotorWidget::clearScreen);
     connect(m_sender, &DCVectorSender::completed, m_listener, &DCResponseListener::cancel);
     connect(m_sender, &DCVectorSender::started, m_listener, &DCResponseListener::listen);
     connect(m_sender, &DCVectorSender::sended, this, &DCMotorWidget::drawSendedPoint);
@@ -133,10 +133,12 @@ QList<QPointF> DCMotorWidget::pointsToSend()
 void DCMotorWidget::run()
 {
     if (!m_sender) return;
+    clearScreen();
     m_sender->start(pointsToSend(), m_sendInterval);
     ui->intervalEdit->setEnabled(false);
     ui->ticksEdit->setEnabled(false);
     ui->applyButton->setEnabled(false);
+    ui->clearButton->setEnabled(false);
     m_chart->setEnabled(false);
 }
 
@@ -147,7 +149,9 @@ void DCMotorWidget::stop()
     ui->intervalEdit->setEnabled(true);
     ui->ticksEdit->setEnabled(true);
     ui->applyButton->setEnabled(true);
+    ui->clearButton->setEnabled(true);
     m_chart->setEnabled(true);
+    m_sendedPoints->clear();
 }
 
 void DCMotorWidget::addPoint(const QPointF &point)
@@ -230,6 +234,7 @@ void DCMotorWidget::clearScreen()
 {
     m_recievedPoints->clear();
     m_sendedPoints->clear();
+    ui->clearButton->setEnabled(false);
 }
 
 void DCMotorWidget::applySettings()
