@@ -238,6 +238,12 @@ void DCMotorWidget::applySettings()
         resetXAxisRange();
     }
     changeXAxisMinorTicks();
+    int ticks = ui->ticksEdit->text().toInt();
+    if (ticks && (m_pointsInterval % ticks) != 0) {
+        ui->warningsLabel->setText(tr("Warning: Interval cannot be divided to ticks without remainder"));
+    } else {
+        ui->warningsLabel->clear();
+    }
 }
 
 DCMotorWidget::ChartView::ChartView(QChart *chart, DCMotorWidget *widget) :
