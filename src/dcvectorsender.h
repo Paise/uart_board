@@ -18,6 +18,7 @@ private:
     QList<QPointF> m_points;
     QTimer m_timer;
     uint32_t m_currentIndex;
+    bool m_skipNextAndStop;
 
 signals:
     void sended(int index, quint16 val);
