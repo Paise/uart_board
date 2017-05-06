@@ -199,12 +199,18 @@ void MainWindow::processRunningState()
     qDebug() << tr("Start messaging");
     ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial->serialPort()->portName()));
     IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
-    if (currentWidget) currentWidget->run();
+    if (currentWidget) {
+        ui->tabWidget->tabBar()->setEnabled(false);
+        currentWidget->run();
+    }
 }
 
 void MainWindow::processStop()
 {
     qDebug() << tr("Stop messaging");
     IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
-    if (currentWidget) currentWidget->stop();
+    if (currentWidget) {
+        ui->tabWidget->tabBar()->setEnabled(true);
+        currentWidget->stop();
+    }
 }
