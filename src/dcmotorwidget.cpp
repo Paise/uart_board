@@ -23,7 +23,8 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     m_recievedPoints(new QLineSeries),
     m_scatter(new QScatterSeries),
     m_sendedPoints(new QScatterSeries),
-    m_sendInterval(INIT_INTERVAL)
+    m_pointsInterval(INIT_INTERVAL),
+    m_sendInterval(m_pointsInterval)
 {
     ui->setupUi(this);
 
@@ -31,13 +32,9 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     ui->intervalEdit->setValidator(new QIntValidator(1, MAX_INTERVAL));
     ui->intervalEdit->setPlaceholderText(QString("1-%0").arg(MAX_INTERVAL));
     ui->intervalEdit->setText(QString("%0").arg(INIT_INTERVAL));
-
-    ui->ticksEdit->setValidator(new QIntValidator(0, 5));
-    ui->ticksEdit->setPlaceholderText(QString("0-5"));
     ui->ticksEdit->setText(QString("0"));
 
-    connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::resetXAxisRange);
-    connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::changeXAxisMinorTicks);
+    connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::applySettings);
 
     for (int i = 0; i < INIT_POINTS_COUNT; ++i) {
         addPoint(QPointF(i*INIT_INTERVAL,0));
@@ -58,11 +55,13 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
     yAxis->setRange(0, 0xFFFF);
     yAxis->setTickCount(Y_MAX/Y_STEP + 1);
-    resetXAxisRange();
     xAxis->setTickCount(INIT_POINTS_COUNT);
 
     ChartView *chartView = new ChartView(m_chart, this);
     ui->mainLayout->insertWidget(0, chartView);
+
+    resetXAxisRange();
+    changeXAxisMinorTicks();
 
     connect(m_scatter, &QXYSeries::pressed, this, &DCMotorWidget::selectPoint);
     connect(m_scatter, &QXYSeries::released, this, &DCMotorWidget::releasePoint);
@@ -159,24 +158,36 @@ void DCMotorWidget::releasePoint(const QPointF &point)
 
 void DCMotorWidget::resetXAxisRange()
 {
-    int interval = ui->intervalEdit->text().toInt();
-    m_chart->axisX()->setRange(0, (INIT_POINTS_COUNT-1)*interval);
+    m_pointsInterval = ui->intervalEdit->text().toInt();
+    if (!m_pointsInterval) {
+        m_pointsInterval = INIT_INTERVAL;
+        ui->intervalEdit->setText(QString("%0").arg(m_pointsInterval));
+    }
+
+    m_chart->axisX()->setRange(0, (INIT_POINTS_COUNT-1)*m_pointsInterval);
     QList<QPointF> points;
     for (int i = 0; i < m_scatter->points().count(); ++i) {
         QPointF oldP = m_scatter->at(i);
-        points << QPointF(i*interval, oldP.ry());
+        points << QPointF(i*m_pointsInterval, oldP.ry());
     }
-    m_series->clear();
-    m_scatter->clear();
-    m_series->append(points);
-    m_scatter->append(points);
+    m_series->replace(points);
+    m_scatter->replace(points);
 }
 
 void DCMotorWidget::changeXAxisMinorTicks()
 {
+    /* To not allow send interval to be less than 1 ms */
+    int maxTicks = m_pointsInterval - 1;
+    ui->ticksEdit->setValidator(new QIntValidator(0, maxTicks));
+    ui->ticksEdit->setPlaceholderText(QString("0-%0").arg(maxTicks));
+    /* Check is new constraints are satisfied */
+    if (ui->ticksEdit->text().toInt() > maxTicks) {
+        ui->ticksEdit->setText(QString("%0").arg(maxTicks));
+    }
+    /* Apply ticks */
     QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
     xAxis->setMinorTickCount(ui->ticksEdit->text().toInt());
-    m_sendInterval = ui->intervalEdit->text().toInt() / (xAxis->minorTickCount() + 1);
+    m_sendInterval = m_pointsInterval / (xAxis->minorTickCount() + 1);
 }
 
 void DCMotorWidget::drawRecievedPoint(int index, quint16 val)
@@ -194,6 +205,14 @@ void DCMotorWidget::clearScreen()
 {
     m_recievedPoints->clear();
     m_sendedPoints->clear();
+}
+
+void DCMotorWidget::applySettings()
+{
+    if (m_sendInterval != ui->intervalEdit->text().toInt()) {
+        resetXAxisRange();
+    }
+    changeXAxisMinorTicks();
 }
 
 DCMotorWidget::ChartView::ChartView(QChart *chart, DCMotorWidget *widget) :

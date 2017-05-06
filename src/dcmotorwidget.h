@@ -39,6 +39,7 @@ private:
     QScatterSeries *m_scatter;
     QScatterSeries *m_sendedPoints;
     QPointF m_selected;
+    int m_pointsInterval;
     int m_sendInterval;
 
 public slots:
@@ -55,6 +56,7 @@ private slots:
     void drawRecievedPoint(int index, quint16 val);
     void drawSendedPoint(int index, quint16 val);
     void clearScreen();
+    void applySettings();
 };
 
 #endif // DCMOTORWIDGET_H
