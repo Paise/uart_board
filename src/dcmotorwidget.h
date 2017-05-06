@@ -39,6 +39,7 @@ private:
     QScatterSeries *m_scatter;
     QScatterSeries *m_sendedPoints;
     QPointF m_selected;
+    int m_sendInterval;
 
 public slots:
     void run();
@@ -50,6 +51,7 @@ private slots:
     void selectPoint(const QPointF &);
     void releasePoint(const QPointF &);
     void resetXAxisRange();
+    void changeXAxisMinorTicks();
     void drawRecievedPoint(int index, quint16 val);
     void drawSendedPoint(int index, quint16 val);
     void clearScreen();
