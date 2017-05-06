@@ -104,6 +104,7 @@ void MainWindow::initStateMachine()
     stateDisconnected->assignProperty(ui->actionConfigure_Port, "enabled", true);
     stateDisconnected->assignProperty(ui->rawTab, "enabled", false);
     stateDisconnected->assignProperty(ui->statusBar, "statusColor", QColor(Qt::red));
+    stateDisconnected->assignProperty(ui->tabWidget->tabBar(), "enabled", true);
 
     stateConnected->assignProperty(ui->actionStart, "enabled", true);
     stateConnected->assignProperty(ui->actionStop, "enabled", false);
@@ -111,6 +112,7 @@ void MainWindow::initStateMachine()
     stateConnected->assignProperty(ui->actionConfigure_Port, "enabled", true);
     stateConnected->assignProperty(ui->rawTab, "enabled", true);
     stateConnected->assignProperty(ui->statusBar, "statusColor", QColor(Qt::yellow));
+    stateConnected->assignProperty(ui->tabWidget->tabBar(), "enabled", true);
 
     stateRunnig->assignProperty(ui->actionStart, "enabled", false);
     stateRunnig->assignProperty(ui->actionStop, "enabled", true);
@@ -118,6 +120,7 @@ void MainWindow::initStateMachine()
     stateRunnig->assignProperty(ui->actionConfigure_Port, "enabled", false);
     stateRunnig->assignProperty(ui->rawTab, "enabled", true);
     stateRunnig->assignProperty(ui->statusBar, "statusColor", QColor(Qt::green));
+    stateRunnig->assignProperty(ui->tabWidget->tabBar(), "enabled", false);
 
     stateDisconnected->addTransition(m_serial, SIGNAL(opened()), stateConnected);
     stateConnected->addTransition(ui->actionStart, SIGNAL(triggered()), stateRunnig);
@@ -199,18 +202,12 @@ void MainWindow::processRunningState()
     qDebug() << tr("Start messaging");
     ui->statusBar->setPermanentMessage(tr("Running on %0").arg(m_serial->serialPort()->portName()));
     IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
-    if (currentWidget) {
-        ui->tabWidget->tabBar()->setEnabled(false);
-        currentWidget->run();
-    }
+    if (currentWidget) currentWidget->run();
 }
 
 void MainWindow::processStop()
 {
     qDebug() << tr("Stop messaging");
     IRunnableWidget *currentWidget = dynamic_cast<IRunnableWidget*>(ui->tabWidget->currentWidget());
-    if (currentWidget) {
-        ui->tabWidget->tabBar()->setEnabled(true);
-        currentWidget->stop();
-    }
+    if (currentWidget) currentWidget->stop();
 }
