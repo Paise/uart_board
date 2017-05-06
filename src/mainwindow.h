@@ -9,6 +9,9 @@ namespace Ui {
 class MainWindow;
 }
 
+/**
+ * @brief Главное окно приложения
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -18,23 +21,65 @@ public:
     ~MainWindow();
 
 private:
+    /**
+     * @brief При открытии окна восстанавливаются настройки, сохраненные в прошлой сессии
+     */
     void showEvent(QShowEvent *);
+    /**
+     * @brief При закрытии окна автоматически сохраняется текущее состояние окна
+     */
     void closeEvent(QCloseEvent *);
+    /**
+     * @brief Инициализирует иконки виджетов
+     */
     void initIcons();
+    /**
+     * @brief Инициализирует машину состояний, управляющуюю поведением MainWindow
+     */
     void initStateMachine();
 
     Ui::MainWindow *ui;
+    /**
+     * @brief Объект для работы с последовательным портом
+     */
     SerialPortHolder *m_serial;
+    /**
+     * @brief Машина состояний управляет поведением и отображением главного окна
+     *
+     * @details Приложение может находиться в трех состояниях - порт не сконфиурирован (Disconnected), порт сконфигурирован (Connected)
+     * и запущено выполнение программы (Running). В зависимости от текущего состояния меняются состояния виджетов главного окна.
+     */
     QStateMachine m_stateMachine;
 
 private slots:
+    /**
+     * @brief Показать окно About
+     */
     void about();
+    /**
+     * @brief Сохранить логи приложения в файл
+     */
     void saveLogs();
+    /**
+     * @brief Открыть окно настройки последовательного порта
+     */
     void configurePort();
 
+    /**
+     * @brief Вызывается при переходе в состояние Disconnected
+     */
     void processDisconnectState();
+    /**
+     * @brief Вызывается при переходе в состояние Connected
+     */
     void processConnectState();
+    /**
+     * @brief Вызывается при переходе в состояние Running
+     */
     void processRunningState();
+    /**
+     * @brief Вызывается при выходе из состояния Running
+     */
     void processStop();
 };
 

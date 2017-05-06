@@ -14,6 +14,9 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &ctx, const Q
     case QtDebugMsg:
         fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), ctx.file, ctx.line, ctx.function);
         break;
+    case QtInfoMsg:
+        fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), ctx.file, ctx.line, ctx.function);
+        break;
     case QtWarningMsg:
         fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), ctx.file, ctx.line, ctx.function);
         break;

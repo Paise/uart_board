@@ -11,6 +11,9 @@ namespace Ui {
 class ConfigureDialog;
 }
 
+/**
+ * @brief Диалог настройки последовательного порта
+ */
 class ConfigureDialog : public QDialog
 {
     Q_OBJECT
@@ -19,15 +22,46 @@ public:
     explicit ConfigureDialog(QWidget *parent = 0);
     ~ConfigureDialog();
 
+    /**
+     * @brief Имя заданного порта
+     * @return Имя порта
+     */
     QString portName() const;
+    /**
+     * @brief Скорость работы порта
+     * @return Скорость работы порта
+     */
     QSerialPort::BaudRate baudRate() const;
+    /**
+     * @brief Количество бит даных
+     * @return Количество бит даных
+     */
     QSerialPort::DataBits dataBits() const;
+    /**
+     * @brief Бит паритета
+     * @return Бит паритета
+     */
     QSerialPort::Parity parity() const;
+    /**
+     * @brief Наличие стоп-бита
+     * @return Наличие стоп-бита
+     */
     QSerialPort::StopBits stopBits() const;
+    /**
+     * @brief Контроль потока
+     * @return Контроль потока
+     */
     QSerialPort::FlowControl flowControl() const;
 
 private:
+    /**
+     * @brief Заполняет словари воможных значений параметров
+     */
     void initAvailableValues();
+    /**
+     * @brief Блокирует кнопки диалога
+     * @param enabled Раблокировать или разблокировать кнопки
+     */
     void updateEnabledStates(bool enabled);
 
     Ui::ConfigureDialog *ui;
@@ -36,11 +70,24 @@ private:
     QMap<QString, QSerialPort::Parity> m_parities;
     QMap<QString, QSerialPort::StopBits> m_stopBits;
     QMap<QString, QSerialPort::FlowControl> m_flowControls;
+    /**
+     * @brief Таймер, проверяющий наличие доступных портов
+     */
     QTimer m_portSearchTimer;
 
 private slots:
+    /**
+     * @brief Променить настройки порта по-умолчанию
+     */
     void initDefaults();
+    /**
+     * @brief Поиск доступных портов и обновление списка портов
+     */
     void refreshPortsList();
+    /**
+     * @brief Обрабатывает нажатие диалогойвой кнопки
+     * @param button Нажатая кнопка
+     */
     void processDialogButtonClick(QAbstractButton *button);
 };
 
