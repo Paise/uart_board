@@ -11,7 +11,8 @@ using namespace QtCharts;
 #define Y_MAX (0xFFFF)
 #define Y_STEP (0x1FFF)
 #define MAX_INTERVAL (5000)
-#define INIT_INTERVAL (200)
+#define INIT_INTERVAL (2000)
+#define INIT_TICKS (16)
 
 DCMotorWidget::DCMotorWidget(QWidget *parent) :
     IRunnableWidget(parent),
@@ -32,7 +33,7 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     ui->intervalEdit->setValidator(new QIntValidator(1, MAX_INTERVAL));
     ui->intervalEdit->setPlaceholderText(QString("1-%0").arg(MAX_INTERVAL));
     ui->intervalEdit->setText(QString("%0").arg(INIT_INTERVAL));
-    ui->ticksEdit->setText(QString("0"));
+    ui->ticksEdit->setText(QString("%0").arg(INIT_TICKS));
 
     connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::applySettings);
     connect(ui->clearButton, &QPushButton::clicked, this, &DCMotorWidget::clearScreen);

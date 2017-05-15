@@ -25,7 +25,7 @@ RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     connect(ui->asciiRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setAsciiValidator);
     connect(ui->decRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setIntValidator);
     connect(ui->hexRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setHexValidator);
-    ui->asciiRadio->setChecked(true);
+    ui->hexRadio->setChecked(true);
 }
 
 RawDataSendWidget::~RawDataSendWidget()
@@ -87,7 +87,7 @@ void RawDataSendWidget::sendData()
         m_serial->writeAsync2Bytes(text.toInt());
     } else {
         bool ok;
-        m_serial->writeAsync2Bytes(text.toInt(&ok, 16));
+        m_serial->writeAsyncByte(text.toInt(&ok, 16));
     }
     ui->writeEdit->insertPlainText(text.append('\n'));
 }

@@ -3,7 +3,11 @@
 
 #include <QObject>
 
-#define COMMAND_CLEAR_SCREEN (0xFFC1)
+#define COMMAND_CLEAR_SCREEN (0x80)
+#define COMMAND_INC_SPEED (0x81)
+#define COMMAND_DEC_SPEED (0x82)
+#define COMMAND_INC_TIMING (0x83)
+#define COMMAND_DEC_TIMING (0x84)
 
 /**
  * @brief Интерфейс для передачи и приема данных по последовательному порту без доступа к его настройкам

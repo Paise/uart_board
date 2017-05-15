@@ -22,7 +22,7 @@ void DCVectorSender::start(QList<QPointF> points, int interval)
     m_currentIndex = 0;
     m_skipNextAndStop = false;
     m_points = points;
-    m_serial->writeAsync2Bytes(COMMAND_CLEAR_SCREEN);
+    m_serial->writeAsyncByte(COMMAND_CLEAR_SCREEN);
     m_timer.start(interval);
     emit started();
 }
@@ -46,7 +46,7 @@ void DCVectorSender::sendNext()
     }
 
     quint16 val = m_points.value(m_currentIndex).ry();
-    m_serial->writeAsync2Bytes(val);
+    m_serial->writeAsyncByte(quint8((val >> 8) / 2));
     emit sended(m_currentIndex, val);
     if (++m_currentIndex == m_points.count()) {
         m_skipNextAndStop = true;
