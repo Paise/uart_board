@@ -6,6 +6,7 @@
 
 #define PORT_SEARCH_PERIOD (1000)
 
+//TODO: current port settings at open
 ConfigureDialog::ConfigureDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfigureDialog),

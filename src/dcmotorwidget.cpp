@@ -14,6 +14,7 @@ using namespace QtCharts;
 #define INIT_INTERVAL (2000)
 #define INIT_TICKS (16)
 
+//TODO: Y axis in ob/sec
 DCMotorWidget::DCMotorWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCMotorWidget),

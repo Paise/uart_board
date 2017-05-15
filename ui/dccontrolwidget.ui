@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DCControlWidget</class>
+ <widget class="QWidget" name="DCControlWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="layout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="speedLabel">
+       <property name="text">
+        <string>Speed</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="3" column="0">
+        <widget class="QLabel" name="setpointLabel">
+         <property name="text">
+          <string>Setpoint</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="setpointEdit"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="plusButton">
+         <property name="text">
+          <string>+</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="minusButton">
+         <property name="text">
+          <string>-</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="timingLabel">
+       <property name="text">
+        <string>Timing</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radio4">
+       <property name="text">
+        <string>4 sec</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">timingsGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radio8">
+       <property name="text">
+        <string>8 sec</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">timingsGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radio16">
+       <property name="text">
+        <string>16 sec</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">timingsGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radio32">
+       <property name="text">
+        <string>32 sec</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">timingsGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Clear Screen</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="timingsGroup"/>
+ </buttongroups>
+</ui>

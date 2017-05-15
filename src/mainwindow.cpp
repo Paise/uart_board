@@ -14,6 +14,7 @@
 #include <QStandardPaths>
 #include <QSettings>
 
+//Save|load project
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -59,6 +60,8 @@ void MainWindow::showEvent(QShowEvent *)
     this->restoreGeometry(settings.value("geometry").toByteArray());
     this->restoreState(settings.value("state").toByteArray());
     settings.endGroup();
+
+    configurePort();
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

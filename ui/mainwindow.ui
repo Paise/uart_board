@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="RawDataSendWidget" name="rawTab">
        <attribute name="title">
@@ -27,7 +27,12 @@
       </widget>
       <widget class="DCMotorWidget" name="DCTab">
        <attribute name="title">
-        <string>DC Motor</string>
+        <string>DC Graph</string>
+       </attribute>
+      </widget>
+      <widget class="DCControlWidget" name="controlTab">
+       <attribute name="title">
+        <string>DC Control</string>
        </attribute>
       </widget>
      </widget>
@@ -202,6 +207,12 @@
    <class>DCMotorWidget</class>
    <extends>QWidget</extends>
    <header>dcmotorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DCControlWidget</class>
+   <extends>QWidget</extends>
+   <header>dccontrolwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
