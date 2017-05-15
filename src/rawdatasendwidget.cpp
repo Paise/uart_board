@@ -5,11 +5,12 @@
 #include <QDebug>
 #include <QTextCursor>
 
+//TODO: upkey to previous values
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::RawDataSendWidget),
-    m_intValidator(new QIntValidator(0, 0xFFFF, this)),
-    m_hexValidator(new QRegExpValidator(QRegExp("(\\d|[a-f])*"), this))
+    m_intValidator(new QIntValidator(0, 0xFF, this)),
+    m_hexValidator(new QRegExpValidator(QRegExp("(\\d|[a-f]){1,2}"), this))
 {
     ui->setupUi(this);
     ui->writeEdit->setReadOnly(true);
@@ -26,6 +27,7 @@ RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     connect(ui->decRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setIntValidator);
     connect(ui->hexRadio, &QRadioButton::clicked, this, &RawDataSendWidget::setHexValidator);
     ui->hexRadio->setChecked(true);
+    setHexValidator();
 }
 
 RawDataSendWidget::~RawDataSendWidget()
@@ -84,7 +86,7 @@ void RawDataSendWidget::sendData()
     if (ui->asciiRadio->isChecked()) {
         m_serial->writeAsync(text.toUtf8());
     } else if (ui->decRadio->isChecked()) {
-        m_serial->writeAsync2Bytes(text.toInt());
+        m_serial->writeAsyncByte(text.toInt());
     } else {
         bool ok;
         m_serial->writeAsyncByte(text.toInt(&ok, 16));
@@ -105,17 +107,20 @@ void RawDataSendWidget::recieveData(const QByteArray &data)
 void RawDataSendWidget::setIntValidator()
 {
     ui->toSendLineEdit->setValidator(m_intValidator);
+    ui->toSendLineEdit->setPlaceholderText("0-255");
     qDebug() << tr("Switched to decimal");
 }
 
 void RawDataSendWidget::setHexValidator()
 {
     ui->toSendLineEdit->setValidator(m_hexValidator);
+    ui->toSendLineEdit->setPlaceholderText("0-FF");
     qDebug() << tr("Switched to hex");
 }
 
 void RawDataSendWidget::setAsciiValidator()
 {
     ui->toSendLineEdit->setValidator(NULL);
+    ui->toSendLineEdit->setPlaceholderText("a-z");
     qDebug() << tr("Switched to ascii");
 }

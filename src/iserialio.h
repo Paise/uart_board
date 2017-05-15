@@ -8,6 +8,11 @@
 #define COMMAND_DEC_SPEED (0x82)
 #define COMMAND_INC_TIMING (0x83)
 #define COMMAND_DEC_TIMING (0x84)
+#define COMMAND_SET_SETPOINT (0xD0)
+#define COMMAND_SET_TIMING (0xD1)
+#define COMMAND_SET_PID_P (0xD2)
+#define COMMAND_SET_PID_I (0xD3)
+#define COMMAND_SET_PID_D (0xD4)
 
 /**
  * @brief Интерфейс для передачи и приема данных по последовательному порту без доступа к его настройкам
