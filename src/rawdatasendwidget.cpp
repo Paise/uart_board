@@ -6,6 +6,7 @@
 #include <QTextCursor>
 
 //TODO: upkey to previous values
+//TODO: scroll to new
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::RawDataSendWidget),

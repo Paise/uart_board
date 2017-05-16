@@ -6,6 +6,7 @@ DCControlWidget::DCControlWidget(QWidget *parent) :
     ui(new Ui::DCControlWidget)
 {
     ui->setupUi(this);
+
 }
 
 DCControlWidget::~DCControlWidget()
