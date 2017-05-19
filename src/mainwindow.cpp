@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction( ui->actionConfigure_Port );
     ui->rawTab->setSerialDevice(m_serial);
     ui->DCTab->setSerialDevice(m_serial);
+    ui->controlTab->setSerialDevice(m_serial);
 
     MessageLogger::instance()->setOutWidget(ui->logsEdit);
     initIcons();

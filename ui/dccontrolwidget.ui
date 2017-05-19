@@ -127,7 +127,7 @@
    </item>
    <item>
     <layout class="QGridLayout" name="speedLayout">
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QPushButton" name="clearScreenButton">
        <property name="text">
         <string>Clear Screen</string>
@@ -181,6 +181,13 @@
         </spacer>
        </item>
       </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="sendSettingsButton">
+       <property name="text">
+        <string>Send Settings</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
