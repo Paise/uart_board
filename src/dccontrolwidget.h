@@ -37,6 +37,7 @@ public slots:
     void setTiming16();
     void setTiming32();
     void sendSettings();
+    void processSerialResponse(const QByteArray &data);
 };
 
 #endif // DCCONTROLWIDGET_H

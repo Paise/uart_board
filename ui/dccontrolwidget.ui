@@ -46,7 +46,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="frame">
+    <widget class="QFrame" name="controlsFrame">
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -118,35 +118,35 @@
         <item>
          <widget class="QLabel" name="timingLabel">
           <property name="text">
-           <string>Timing</string>
+           <string>Timing (sec)</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="radio4">
           <property name="text">
-           <string>4 sec</string>
+           <string>4</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="radio8">
           <property name="text">
-           <string>8 sec</string>
+           <string>8</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="radio16">
           <property name="text">
-           <string>16 sec</string>
+           <string>16</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="radio32">
           <property name="text">
-           <string>32 sec</string>
+           <string>32</string>
           </property>
          </widget>
         </item>
@@ -169,33 +169,6 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <layout class="QGridLayout" name="speedControlsLayout">
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="setpointEdit">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLCDNumber" name="setpointLcd">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="setpointLabel">
-            <property name="text">
-             <string>Setpoint</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
@@ -213,6 +186,40 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="setpointEdit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="setpointLabel">
+            <property name="text">
+             <string>Setpoint</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLCDNumber" name="setpointLcd">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>rps</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

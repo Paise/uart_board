@@ -2,6 +2,9 @@
 #include "ui_dccontrolwidget.h"
 #include "iserialio.h"
 #include <QIntValidator>
+#include <QDebug>
+
+#define MAX_SPEED (72)
 
 DCControlWidget::DCControlWidget(QWidget *parent) :
     IRunnableWidget(parent),
@@ -20,11 +23,13 @@ DCControlWidget::DCControlWidget(QWidget *parent) :
     ui->spinBoxKd->setValue(0.10);
     ui->radio4->setChecked(true);
 
-    ui->setpointEdit->setValidator(new QIntValidator(0,COMMAND_CLEAR_SCREEN-1));
+    ui->setpointEdit->setValidator(new QIntValidator(0,MAX_SPEED));
+    ui->setpointEdit->setPlaceholderText(QString("0-%0").arg(MAX_SPEED));
 
     connect(ui->clearScreenButton, &QPushButton::clicked, this, &DCControlWidget::clearScreen);
     connect(ui->sendSettingsButton, &QPushButton::clicked, this, &DCControlWidget::sendSettings);
     connect(ui->setpointEdit, &QLineEdit::returnPressed, this, &DCControlWidget::sendSetpoint);
+    connect(m_serial, &ISerialIO::dataRecieved, this, &DCControlWidget::processSerialResponse);
 }
 
 DCControlWidget::~DCControlWidget()
@@ -70,7 +75,9 @@ void DCControlWidget::clearScreen(){
 
 void DCControlWidget::sendSetpoint()
 {
-    m_serial->writeAsyncByte((quint8) ui->setpointEdit->text().toInt());
+    quint8 speed = (quint8) ui->setpointEdit->text().toInt();
+    quint8 value = speed * ((float) COMMAND_MAX_SETPOINT/ (float) MAX_SPEED);
+    m_serial->writeAsyncByte(value);
 }
 
 void DCControlWidget::increaseSpeed(){
@@ -131,5 +138,20 @@ void DCControlWidget::sendSettings(){
     else if (ui->radio32->isChecked()) setTiming32();
 
     return;
+}
+
+void DCControlWidget::processSerialResponse(const QByteArray &data)
+{
+    if (!this->isVisible()) return;
+
+    if (data.size() != 1) return;
+    switch ((quint8) data.at(0)) {
+    case REMOTE_REBOOT:
+        sendSettings();
+        break;
+    default:
+        qDebug() << tr("DCControl recieved unknown response");
+        break;
+    }
 }
 

@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+#define COMMAND_MAX_SETPOINT (0x7F)
 #define COMMAND_CLEAR_SCREEN (0x80)
 #define COMMAND_INC_SPEED (0x81)
 #define COMMAND_DEC_SPEED (0x82)
