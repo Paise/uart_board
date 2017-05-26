@@ -178,6 +178,8 @@ void MainWindow::configurePort()
 {
     ConfigureDialog dialog(this);
 
+    dialog.setWindowFlags(Qt::Window);
+    dialog.setWindowModality(Qt::ApplicationModal);
     if (dialog.exec() == QDialog::Accepted) {
         m_serial->disconnectPort();
         m_serial->serialPort()->setPortName( dialog.portName() );

@@ -6,6 +6,7 @@
 
 #define SPEED_UPDATE_FREQ (500)
 
+//TODO: disable speed buttons at stop
 DCControlWidget::DCControlWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCControlWidget)
@@ -56,7 +57,6 @@ void DCControlWidget::run()
     connect(ui->radio16, &QRadioButton::clicked, this, &DCControlWidget::setTiming16);
     connect(ui->radio32, &QRadioButton::clicked, this, &DCControlWidget::setTiming32);
     ui->sendSettingsButton->setEnabled(false);
-    ui->speedLayout->setEnabled(true);
     m_speedTimer.start();
 }
 
@@ -70,7 +70,6 @@ void DCControlWidget::stop()
     disconnect(ui->radio16, &QRadioButton::clicked, this, &DCControlWidget::setTiming16);
     disconnect(ui->radio32, &QRadioButton::clicked, this, &DCControlWidget::setTiming32);
     ui->sendSettingsButton->setEnabled(true);
-    ui->speedLayout->setEnabled(false);
     m_speedTimer.stop();
 }
 
