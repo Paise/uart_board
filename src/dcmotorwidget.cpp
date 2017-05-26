@@ -60,7 +60,9 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
     yAxis->setRange(Y_MIN, Y_MAX);
     yAxis->setTickCount(Y_MAX/Y_STEP + 1);
+    yAxis->setTitleText("rps");
     xAxis->setTickCount(INIT_POINTS_COUNT);
+    xAxis->setTitleText("msec");
 
     ChartView *chartView = new ChartView(m_chart, this);
     ui->mainLayout->insertWidget(0, chartView);

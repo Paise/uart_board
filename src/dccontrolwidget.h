@@ -2,6 +2,7 @@
 #define DCCONTROLWIDGET_H
 
 #include "irunnablewidget.h"
+#include <QTimer>
 
 namespace Ui {
 class DCControlWidget;
@@ -20,7 +21,7 @@ public:
 private:
     Ui::DCControlWidget *ui;
     ISerialIO *m_serial;
-
+    QTimer m_speedTimer;
 
 public slots:
     void run();
@@ -29,6 +30,7 @@ public slots:
     void sendSetpoint();
     void increaseSpeed();
     void decreaseSpeed();
+    void requestSpeed();
     void sendKp(double d);
     void sendKi(double d);
     void sendKd(double d);

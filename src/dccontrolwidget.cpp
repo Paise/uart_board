@@ -4,6 +4,8 @@
 #include <QIntValidator>
 #include <QDebug>
 
+#define SPEED_UPDATE_FREQ (500)
+
 DCControlWidget::DCControlWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCControlWidget)
@@ -23,7 +25,9 @@ DCControlWidget::DCControlWidget(QWidget *parent) :
 
     ui->setpointEdit->setValidator(new QIntValidator(0,MAX_SPEED));
     ui->setpointEdit->setPlaceholderText(QString("0-%0").arg(MAX_SPEED));
+    m_speedTimer.setInterval(SPEED_UPDATE_FREQ);
 
+    connect(&m_speedTimer, &QTimer::timeout, this, &DCControlWidget::requestSpeed);
     connect(ui->clearScreenButton, &QPushButton::clicked, this, &DCControlWidget::clearScreen);
     connect(ui->sendSettingsButton, &QPushButton::clicked, this, &DCControlWidget::sendSettings);
     connect(ui->setpointEdit, &QLineEdit::returnPressed, this, &DCControlWidget::sendSetpoint);
@@ -51,6 +55,9 @@ void DCControlWidget::run()
     connect(ui->radio8, &QRadioButton::clicked, this, &DCControlWidget::setTiming8);
     connect(ui->radio16, &QRadioButton::clicked, this, &DCControlWidget::setTiming16);
     connect(ui->radio32, &QRadioButton::clicked, this, &DCControlWidget::setTiming32);
+    ui->sendSettingsButton->setEnabled(false);
+    ui->speedLayout->setEnabled(true);
+    m_speedTimer.start();
 }
 
 void DCControlWidget::stop()
@@ -62,6 +69,9 @@ void DCControlWidget::stop()
     disconnect(ui->radio8, &QRadioButton::clicked, this, &DCControlWidget::setTiming8);
     disconnect(ui->radio16, &QRadioButton::clicked, this, &DCControlWidget::setTiming16);
     disconnect(ui->radio32, &QRadioButton::clicked, this, &DCControlWidget::setTiming32);
+    ui->sendSettingsButton->setEnabled(true);
+    ui->speedLayout->setEnabled(false);
+    m_speedTimer.stop();
 }
 
 void DCControlWidget::clearScreen(){
@@ -82,6 +92,11 @@ void DCControlWidget::increaseSpeed(){
 void DCControlWidget::decreaseSpeed(){
     m_serial->writeAsyncByte(COMMAND_DEC_SPEED);
     return;
+}
+
+void DCControlWidget::requestSpeed()
+{
+    m_serial->writeAsyncByte(COMMAND_REQ_SPEED);
 }
 
 void DCControlWidget::sendKp(double d){
@@ -140,7 +155,13 @@ void DCControlWidget::processSerialResponse(const QByteArray &data)
 
     if (data.size() != 1) return;
 
-    switch ((quint8) data.at(0)) {
+    quint8 val = (quint8) data.at(0);
+    if (val < COMMAND_MAX_SETPOINT) {
+        ui->setpointLcd->display(val);
+        return;
+    }
+
+    switch (val) {
     case REMOTE_REBOOT:
         sendSettings();
         break;
