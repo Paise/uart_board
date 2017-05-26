@@ -54,7 +54,6 @@ QString RawDataSendWidget::toCurrentEncoding(const QByteArray &data)
     } else if (ui->decRadio->isChecked()) {
         QString hex(data.toHex());
         bool ok;
-        // TODO: split long hex array to 2-bytes
         text = QString("|dec\t|%0").arg(hex.toInt(&ok, 16));
     } else {
         text = QString("|0x\t|") + QString(data.toHex());

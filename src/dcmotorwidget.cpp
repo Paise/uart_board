@@ -14,7 +14,7 @@ using namespace QtCharts;
 #define INIT_INTERVAL (2000)
 #define INIT_TICKS (16)
 
-//TODO: Y axis in ob/sec
+//TODO: Y axis in rps
 DCMotorWidget::DCMotorWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCMotorWidget),
@@ -241,6 +241,7 @@ void DCMotorWidget::clearScreen()
 
 void DCMotorWidget::applySettings()
 {
+    clearScreen();
     if (m_sendInterval != ui->intervalEdit->text().toInt()) {
         resetXAxisRange();
     }
