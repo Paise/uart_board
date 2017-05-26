@@ -1,6 +1,7 @@
 #include "dccontrolwidget.h"
 #include "ui_dccontrolwidget.h"
 #include "iserialio.h"
+#include <QIntValidator>
 
 DCControlWidget::DCControlWidget(QWidget *parent) :
     IRunnableWidget(parent),
@@ -17,11 +18,13 @@ DCControlWidget::DCControlWidget(QWidget *parent) :
     ui->spinBoxKd->setRange(0.0, 2.55);
     ui->spinBoxKd->setSingleStep(0.01);
     ui->spinBoxKd->setValue(0.10);
-
     ui->radio4->setChecked(true);
+
+    ui->setpointEdit->setValidator(new QIntValidator(0,COMMAND_CLEAR_SCREEN-1));
 
     connect(ui->clearScreenButton, &QPushButton::clicked, this, &DCControlWidget::clearScreen);
     connect(ui->sendSettingsButton, &QPushButton::clicked, this, &DCControlWidget::sendSettings);
+    connect(ui->setpointEdit, &QLineEdit::returnPressed, this, &DCControlWidget::sendSetpoint);
 }
 
 DCControlWidget::~DCControlWidget()
@@ -63,6 +66,11 @@ void DCControlWidget::stop()
 void DCControlWidget::clearScreen(){
     m_serial->writeAsyncByte(COMMAND_CLEAR_SCREEN);
     return;
+}
+
+void DCControlWidget::sendSetpoint()
+{
+    m_serial->writeAsyncByte((quint8) ui->setpointEdit->text().toInt());
 }
 
 void DCControlWidget::increaseSpeed(){

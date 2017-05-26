@@ -16,6 +16,8 @@
 #define COMMAND_SET_PID_I (0xD1)
 #define COMMAND_SET_PID_D (0xD2)
 
+#define REMOTE_REBOOT (0xF0)
+
 /**
  * @brief Интерфейс для передачи и приема данных по последовательному порту без доступа к его настройкам
  */

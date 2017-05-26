@@ -26,6 +26,7 @@ public slots:
     void run();
     void stop();
     void clearScreen();
+    void sendSetpoint();
     void increaseSpeed();
     void decreaseSpeed();
     void sendKp(double d);
