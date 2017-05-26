@@ -4,8 +4,11 @@
 #include "ext/QtAwesome/QtAwesome.h"
 #include <QDebug>
 #include <QTextCursor>
+#include <QScrollBar>
+#include <QMenu>
 
-//TODO: upkey to previous values
+#define MAX_LAST_BYTES (10)
+
 //TODO: scroll to new
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     IRunnableWidget(parent),
@@ -18,6 +21,7 @@ RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
     ui->readEdit->setReadOnly(true);
     ui->clearWriteButton->setIcon(QtAwesome::instance()->icon(fa::trasho));
     ui->clearReadButton->setIcon(QtAwesome::instance()->icon(fa::trasho));
+    ui->toSendLineEdit->installEventFilter(this);
 
     connect(ui->sendButton, &QPushButton::clicked, this, &RawDataSendWidget::sendData);
     connect(ui->toSendLineEdit, &QLineEdit::returnPressed, ui->sendButton, &QPushButton::click);
@@ -43,6 +47,30 @@ void RawDataSendWidget::setSerialDevice(ISerialIO *serial)
     }
     m_serial = serial;
     connect(serial, &ISerialIO::dataRecieved, this, &RawDataSendWidget::recieveData);
+}
+
+bool RawDataSendWidget::eventFilter(QObject *watched, QEvent *e)
+{
+    if (watched == ui->toSendLineEdit) {
+        if (e->type() == QEvent::KeyPress) {
+            QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+            if (ke->key() == Qt::Key_Up) {
+                QMenu menu;
+                QPoint pos = ui->toSendLineEdit->rect().topLeft();
+                pos = ui->toSendLineEdit->mapToGlobal(pos);
+                menu.addActions(m_lastSended);
+                QAction *ret = menu.exec(pos);
+                if (ret) {
+                    ui->toSendLineEdit->setText(ret->text());
+                    sendData();
+                    e->accept();
+                    return true;
+                }
+            }
+        }
+    }
+
+    return QWidget::eventFilter(this, e);
 }
 
 QString RawDataSendWidget::toCurrentEncoding(const QByteArray &data)
@@ -92,6 +120,9 @@ void RawDataSendWidget::sendData()
         m_serial->writeAsyncByte(text.toInt(&ok, 16));
     }
     ui->writeEdit->insertPlainText(text.append('\n'));
+    m_lastSended.prepend(new QAction(text));
+    if (m_lastSended.size() > MAX_LAST_BYTES)
+        delete m_lastSended.takeLast();
 }
 
 void RawDataSendWidget::enableSendButton(const QString &text)
@@ -109,6 +140,7 @@ void RawDataSendWidget::setIntValidator()
     ui->toSendLineEdit->setValidator(m_intValidator);
     ui->toSendLineEdit->setPlaceholderText("0-255");
     qDebug() << tr("Switched to decimal");
+    m_lastSended.clear();
 }
 
 void RawDataSendWidget::setHexValidator()
@@ -116,6 +148,7 @@ void RawDataSendWidget::setHexValidator()
     ui->toSendLineEdit->setValidator(m_hexValidator);
     ui->toSendLineEdit->setPlaceholderText("0-FF");
     qDebug() << tr("Switched to hex");
+    m_lastSended.clear();
 }
 
 void RawDataSendWidget::setAsciiValidator()
@@ -123,4 +156,5 @@ void RawDataSendWidget::setAsciiValidator()
     ui->toSendLineEdit->setValidator(NULL);
     ui->toSendLineEdit->setPlaceholderText("a-z");
     qDebug() << tr("Switched to ascii");
+    m_lastSended.clear();
 }

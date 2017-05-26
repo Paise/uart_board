@@ -5,6 +5,8 @@
 #include <QPointer>
 #include <QIntValidator>
 #include <QRegExpValidator>
+#include <QAction>
+#include <QList>
 
 class ISerialIO;
 namespace Ui {
@@ -27,6 +29,7 @@ public:
     void setSerialDevice(ISerialIO *serial);
 
 private:
+    bool eventFilter(QObject *watched, QEvent *event);
     /**
      * @brief Переводит данные в текст, соответствующий текущему формату задания символов
      * @param data Данные для перевода
@@ -38,6 +41,7 @@ private:
     QPointer<ISerialIO> m_serial;
     QIntValidator *m_intValidator;
     QRegExpValidator *m_hexValidator;
+    QList<QAction*> m_lastSended;
 
 public slots:
     /**
