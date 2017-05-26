@@ -17,7 +17,8 @@ void DCResponseListener::recieveData(const QByteArray &array)
     m_buffer.append(array);
     while (m_buffer.count() >= 1) {
         quint16 val = 0;
-        val |= ((quint8) m_buffer.at(0)) << 8;
+        //val |= ((quint8) m_buffer.at(0)) << 8;
+        val = (quint8) m_buffer.at(0);
         m_buffer.remove(0,1);
         emit recieved(m_currentIndex++, val);
     }

@@ -8,13 +8,12 @@
 using namespace QtCharts;
 #define INIT_POINTS_COUNT (8)
 #define Y_MIN (0)
-#define Y_MAX (0xFFFF)
-#define Y_STEP (0x1FFF)
+#define Y_MAX (60)
+#define Y_STEP (5)
 #define MAX_INTERVAL (5000)
 #define INIT_INTERVAL (2000)
 #define INIT_TICKS (16)
 
-//TODO: Y axis in rps
 DCMotorWidget::DCMotorWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCMotorWidget),
@@ -59,7 +58,7 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     /* Axes Settings */
     QValueAxis *yAxis = qobject_cast<QValueAxis*>(m_chart->axisY());
     QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
-    yAxis->setRange(0, 0xFFFF);
+    yAxis->setRange(Y_MIN, Y_MAX);
     yAxis->setTickCount(Y_MAX/Y_STEP + 1);
     xAxis->setTickCount(INIT_POINTS_COUNT);
 

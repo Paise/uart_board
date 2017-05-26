@@ -4,8 +4,6 @@
 #include <QIntValidator>
 #include <QDebug>
 
-#define MAX_SPEED (72)
-
 DCControlWidget::DCControlWidget(QWidget *parent) :
     IRunnableWidget(parent),
     ui(new Ui::DCControlWidget)
@@ -29,7 +27,8 @@ DCControlWidget::DCControlWidget(QWidget *parent) :
     connect(ui->clearScreenButton, &QPushButton::clicked, this, &DCControlWidget::clearScreen);
     connect(ui->sendSettingsButton, &QPushButton::clicked, this, &DCControlWidget::sendSettings);
     connect(ui->setpointEdit, &QLineEdit::returnPressed, this, &DCControlWidget::sendSetpoint);
-    connect(m_serial, &ISerialIO::dataRecieved, this, &DCControlWidget::processSerialResponse);
+    connect(ui->plusButton, &QPushButton::clicked, this, &DCControlWidget::increaseSpeed);
+    connect(ui->minusButton, &QPushButton::clicked, this, &DCControlWidget::decreaseSpeed);
 }
 
 DCControlWidget::~DCControlWidget()
@@ -40,12 +39,11 @@ DCControlWidget::~DCControlWidget()
 void DCControlWidget::setSerialDevice(ISerialIO *serial)
 {
     m_serial = serial;
+    connect(m_serial, &ISerialIO::dataRecieved, this, &DCControlWidget::processSerialResponse);
 }
 
 void DCControlWidget::run()
 {
-    connect(ui->plusButton, &QPushButton::clicked, this, &DCControlWidget::increaseSpeed);
-    connect(ui->minusButton, &QPushButton::clicked, this, &DCControlWidget::decreaseSpeed);
     connect(ui->spinBoxKp, SIGNAL(valueChanged(double)), this, SLOT(sendKp(double)));
     connect(ui->spinBoxKd, SIGNAL(valueChanged(double)), this, SLOT(sendKd(double)));
     connect(ui->spinBoxKi, SIGNAL(valueChanged(double)), this, SLOT(sendKi(double)));
@@ -57,8 +55,6 @@ void DCControlWidget::run()
 
 void DCControlWidget::stop()
 {
-    disconnect(ui->plusButton, &QPushButton::clicked, this, &DCControlWidget::increaseSpeed);
-    disconnect(ui->minusButton, &QPushButton::clicked, this, &DCControlWidget::decreaseSpeed);
     disconnect(ui->spinBoxKp, SIGNAL(valueChanged(double)), this, SLOT(sendKp(double)));
     disconnect(ui->spinBoxKd, SIGNAL(valueChanged(double)), this, SLOT(sendKd(double)));
     disconnect(ui->spinBoxKi, SIGNAL(valueChanged(double)), this, SLOT(sendKi(double)));
@@ -75,9 +71,7 @@ void DCControlWidget::clearScreen(){
 
 void DCControlWidget::sendSetpoint()
 {
-    quint8 speed = (quint8) ui->setpointEdit->text().toInt();
-    quint8 value = speed * ((float) COMMAND_MAX_SETPOINT/ (float) MAX_SPEED);
-    m_serial->writeAsyncByte(value);
+    m_serial->writeAsyncByte((quint8) ui->setpointEdit->text().toInt());
 }
 
 void DCControlWidget::increaseSpeed(){
@@ -145,6 +139,7 @@ void DCControlWidget::processSerialResponse(const QByteArray &data)
     if (!this->isVisible()) return;
 
     if (data.size() != 1) return;
+
     switch ((quint8) data.at(0)) {
     case REMOTE_REBOOT:
         sendSettings();
