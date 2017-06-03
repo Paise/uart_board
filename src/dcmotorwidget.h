@@ -45,6 +45,8 @@ private:
      * @return Список точек
      */
     QList<QPointF> pointsToSend();
+    qreal nextY(const qreal &ry);
+    qreal nextX(const qreal &rx);
 
     /**
      * @brief Реализация QChartView, переопределяющая обработку события движения мыши по графику

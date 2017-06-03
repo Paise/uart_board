@@ -98,13 +98,8 @@ bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
     if (m_selected.isNull()) return false;
 
     QPointF atMouse = m_chart->mapToValue(e->pos());
-    qreal nextY = ((int) (atMouse.ry()/Y_STEP)) * Y_STEP;
-    if (nextY < Y_MIN)
-        nextY = Y_MIN;
-    else if (nextY > Y_MAX)
-        nextY = Y_MAX;
 
-    QPointF next(m_selected.rx(), nextY);
+    QPointF next(nextX(atMouse.rx()), nextY(atMouse.ry()));
     replacePoint(m_selected, next);
     m_selected = next;
     e->accept();
@@ -131,6 +126,40 @@ QList<QPointF> DCMotorWidget::pointsToSend()
     }
 
     return points;
+}
+
+qreal DCMotorWidget::nextY(const qreal &ry)
+{
+    qreal nextY = ((int) (ry/Y_STEP)) * Y_STEP;
+
+    if (nextY < Y_MIN)
+        nextY = Y_MIN;
+    else if (nextY > Y_MAX)
+        nextY = Y_MAX;
+
+    return nextY;
+}
+
+qreal DCMotorWidget::nextX(const qreal &rx)
+{
+    QList<QPointF> points = m_scatter->points();
+    int index = points.indexOf(m_selected);
+    if (index == points.size()-1) return m_selected.rx();
+
+    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
+    qreal step = xAxis->max() / ((xAxis->minorTickCount()+1) * (INIT_POINTS_COUNT-1));
+    qreal minX = (index == 0) ? 0 : m_scatter->points().value(index-1).rx();
+    qreal maxX = m_scatter->points().value(index+1).rx();
+    qreal nextX = (floor(rx/step)) * step;
+
+    minX += step;
+    maxX -= step;
+    if (nextX < minX)
+        nextX = minX;
+    else if (nextX > maxX)
+        nextX = maxX;
+
+    return nextX;
 }
 
 void DCMotorWidget::run()
@@ -190,6 +219,7 @@ void DCMotorWidget::releasePoint(const QPointF &point)
 
 void DCMotorWidget::resetXAxisRange()
 {
+    int prev_interval = m_pointsInterval;
     m_pointsInterval = ui->intervalEdit->text().toInt();
     if (!m_pointsInterval) {
         m_pointsInterval = INIT_INTERVAL;
@@ -198,9 +228,10 @@ void DCMotorWidget::resetXAxisRange()
 
     m_chart->axisX()->setRange(0, (INIT_POINTS_COUNT-1)*m_pointsInterval);
     QList<QPointF> points;
+    float scaler = (float) m_pointsInterval / (float) prev_interval;
     for (int i = 0; i < m_scatter->points().count(); ++i) {
         QPointF oldP = m_scatter->at(i);
-        points << QPointF(i*m_pointsInterval, oldP.ry());
+        points << QPointF(oldP.rx()*scaler, oldP.ry());
     }
     m_series->replace(points);
     m_scatter->replace(points);

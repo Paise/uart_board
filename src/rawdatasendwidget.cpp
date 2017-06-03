@@ -7,7 +7,7 @@
 #include <QScrollBar>
 #include <QMenu>
 
-#define MAX_LAST_BYTES (10)
+#define MAX_LAST_BYTES (5)
 
 //TODO: scroll to new
 RawDataSendWidget::RawDataSendWidget(QWidget *parent) :
