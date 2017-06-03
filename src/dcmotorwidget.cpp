@@ -110,19 +110,19 @@ QList<QPointF> DCMotorWidget::pointsToSend()
 {
     QList<QPointF> points;
     QList<QPointF> chartPoints = m_scatter->points();
-    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
 
-    for (auto p = chartPoints.begin(); p != chartPoints.end(); ++p) {
-        points << QPointF(*p);
-        if (p+1 == chartPoints.end()) break;
-
-        float mult = ((*(p+1)).ry() - (*p).ry()) / (xAxis->minorTickCount() + 1);
-        for (int i = 1; i <= xAxis->minorTickCount(); ++i) {
+    points.append(*chartPoints.begin());
+    for (auto p = chartPoints.begin()+1; p != chartPoints.end(); ++p) {
+        auto prev = p - 1;
+        int stepsBetween = round((p->rx() - prev->rx()) / m_sendInterval);
+        float mult = (p->ry() - prev->ry()) / (stepsBetween);
+        for (int i = 1; i <= stepsBetween-1; ++i) {
             QPointF point;
-            point.setX(p->rx() + i*m_sendInterval);
-            point.setY(p->ry() + i*mult);
+            point.setX(prev->rx() + i*m_sendInterval);
+            point.setY(prev->ry() + i*mult);
             points << point;
         }
+        points << QPointF(*p);
     }
 
     return points;
@@ -146,14 +146,12 @@ qreal DCMotorWidget::nextX(const qreal &rx)
     int index = points.indexOf(m_selected);
     if (index == points.size()-1) return m_selected.rx();
 
-    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
-    qreal step = xAxis->max() / ((xAxis->minorTickCount()+1) * (INIT_POINTS_COUNT-1));
     qreal minX = (index == 0) ? 0 : m_scatter->points().value(index-1).rx();
     qreal maxX = m_scatter->points().value(index+1).rx();
-    qreal nextX = (floor(rx/step)) * step;
+    qreal nextX = (floor(rx/m_sendInterval)) * m_sendInterval;
 
-    minX += step;
-    maxX -= step;
+    minX += m_sendInterval;
+    maxX -= m_sendInterval;
     if (nextX < minX)
         nextX = minX;
     else if (nextX > maxX)
@@ -226,7 +224,7 @@ void DCMotorWidget::resetXAxisRange()
         ui->intervalEdit->setText(QString("%0").arg(m_pointsInterval));
     }
 
-    m_chart->axisX()->setRange(0, (INIT_POINTS_COUNT-1)*m_pointsInterval);
+    m_chart->axisX()->setRange(0, (m_series->count()-1)*m_pointsInterval);
     QList<QPointF> points;
     float scaler = (float) m_pointsInterval / (float) prev_interval;
     for (int i = 0; i < m_scatter->points().count(); ++i) {
