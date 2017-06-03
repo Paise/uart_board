@@ -36,6 +36,14 @@ public:
      */
     bool processChartMouseMove(QMouseEvent *e);
 
+    QList<QPointF> userPoints() const;
+    QList<QPointF> recievedPoints() const;
+    int minorTicks() const;
+    void setUserPoints(const QList<QPointF> &points);
+    void setRecievedPoints(const QList<QPointF> &points);
+    void setMinorTicks(int ticks);
+
+
 private:
     /**
      * @brief Формирует список точек, которые будут отправлены на двигатель
@@ -45,8 +53,19 @@ private:
      * @return Список точек
      */
     QList<QPointF> pointsToSend();
+
     qreal nextY(const qreal &ry);
     qreal nextX(const qreal &rx);
+    void checkRemainder();
+
+    /**
+     * @brief Интервал межд точками на графике
+     */
+    int pointsInterval() const;
+    /**
+     * @brief Интервал между отправляемыми точками
+     */
+    int sendInterval() const;
 
     /**
      * @brief Реализация QChartView, переопределяющая обработку события движения мыши по графику
@@ -96,14 +115,6 @@ private:
      * @brief Текущая выделенная мышкой точка на графике
      */
     QPointF m_selected;
-    /**
-     * @brief Интервал межд точками на графике
-     */
-    int m_pointsInterval;
-    /**
-     * @brief Интервал между отправляемыми точками
-     */
-    int m_sendInterval;
 
 public slots:
     /**
@@ -116,10 +127,6 @@ public slots:
     void stop();
 
 private slots:
-    /**
-     * @brief Добавляет уставку на график
-     */
-    void addPoint(const QPointF &);
     /**
      * @brief Заменяет уставку на графике
      * @param oldp Старая уставка
@@ -139,7 +146,8 @@ private slots:
     /**
      * @brief Обновляет отображение оси X при изменении интервала между точками
      */
-    void resetXAxisRange();
+    void rescalePointsForNewInterval();
+    void changeXAxisRange();
     /**
      * @brief Обновляет отображение оси X при изменении количества промежуточных значений между точками
      */

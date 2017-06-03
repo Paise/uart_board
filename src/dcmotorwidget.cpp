@@ -23,26 +23,13 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     m_series(new QLineSeries),
     m_recievedPoints(new QLineSeries),
     m_scatter(new QScatterSeries),
-    m_sendedPoints(new QScatterSeries),
-    m_pointsInterval(INIT_INTERVAL),
-    m_sendInterval(m_pointsInterval)
+    m_sendedPoints(new QScatterSeries)
 {
     ui->setupUi(this);
 
     /* Init controls*/
     ui->intervalEdit->setValidator(new QIntValidator(1, MAX_INTERVAL));
     ui->intervalEdit->setPlaceholderText(QString("1-%0").arg(MAX_INTERVAL));
-    ui->intervalEdit->setText(QString("%0").arg(INIT_INTERVAL));
-    ui->ticksEdit->setText(QString("%0").arg(INIT_TICKS));
-
-    connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::applySettings);
-    connect(ui->clearButton, &QPushButton::clicked, this, &DCMotorWidget::clearScreen);
-
-    m_series->clear();
-    m_scatter->clear();
-    for (int i = 0; i < INIT_POINTS_COUNT; ++i) {
-        addPoint(QPointF(i*INIT_INTERVAL,0));
-    }
     /* Series Settings */
     m_scatter->setColor(Qt::green);
     m_sendedPoints->setColor(Qt::red);
@@ -61,17 +48,24 @@ DCMotorWidget::DCMotorWidget(QWidget *parent) :
     yAxis->setRange(Y_MIN, Y_MAX);
     yAxis->setTickCount(Y_MAX/Y_STEP + 1);
     yAxis->setTitleText("rps");
-    xAxis->setTickCount(INIT_POINTS_COUNT);
     xAxis->setTitleText("msec");
-
+    /* Create initial points */
+    QList<QPointF> initPoints;
+    for (int i = 0; i < INIT_POINTS_COUNT; ++i) {
+        initPoints.append(QPointF(i*INIT_INTERVAL,0));
+    }
+    setUserPoints(initPoints);
+    setMinorTicks(INIT_TICKS);
+    /* Add chart on widget */
     ChartView *chartView = new ChartView(m_chart, this);
     ui->mainLayout->insertWidget(0, chartView);
 
-    resetXAxisRange();
-    changeXAxisMinorTicks();
-
     connect(m_scatter, &QXYSeries::pressed, this, &DCMotorWidget::selectPoint);
     connect(m_scatter, &QXYSeries::released, this, &DCMotorWidget::releasePoint);
+    connect(ui->intervalEdit, &QLineEdit::returnPressed, this, &DCMotorWidget::rescalePointsForNewInterval);
+    connect(ui->ticksEdit, &QLineEdit::returnPressed, this, &DCMotorWidget::changeXAxisMinorTicks);
+    connect(ui->applyButton, &QPushButton::clicked, this, &DCMotorWidget::applySettings);
+    connect(ui->clearButton, &QPushButton::clicked, this, &DCMotorWidget::clearScreen);
 }
 
 DCMotorWidget::~DCMotorWidget()
@@ -106,6 +100,46 @@ bool DCMotorWidget::processChartMouseMove(QMouseEvent *e)
     return true;
 }
 
+QList<QPointF> DCMotorWidget::userPoints() const
+{
+    return m_scatter->points();
+}
+
+QList<QPointF> DCMotorWidget::recievedPoints() const
+{
+    return m_recievedPoints->points();
+}
+
+int DCMotorWidget::minorTicks() const
+{
+    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
+    return xAxis->minorTickCount();
+}
+
+void DCMotorWidget::setUserPoints(const QList<QPointF> &points)
+{
+    m_scatter->clear();
+    m_series->clear();
+    m_scatter->append(points);
+    m_series->append(points);
+    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
+    xAxis->setTickCount(points.count());
+    ui->intervalEdit->setText(QString("%0").arg(pointsInterval()));
+    changeXAxisRange();
+}
+
+void DCMotorWidget::setRecievedPoints(const QList<QPointF> &points)
+{
+    clearScreen();
+    m_recievedPoints->append(points);
+}
+
+void DCMotorWidget::setMinorTicks(int ticks)
+{
+    ui->ticksEdit->setText(QString("%0").arg(ticks));
+    changeXAxisMinorTicks();
+}
+
 QList<QPointF> DCMotorWidget::pointsToSend()
 {
     QList<QPointF> points;
@@ -114,11 +148,11 @@ QList<QPointF> DCMotorWidget::pointsToSend()
     points.append(*chartPoints.begin());
     for (auto p = chartPoints.begin()+1; p != chartPoints.end(); ++p) {
         auto prev = p - 1;
-        int stepsBetween = round((p->rx() - prev->rx()) / m_sendInterval);
+        int stepsBetween = round((p->rx() - prev->rx()) / sendInterval());
         float mult = (p->ry() - prev->ry()) / (stepsBetween);
         for (int i = 1; i <= stepsBetween-1; ++i) {
             QPointF point;
-            point.setX(prev->rx() + i*m_sendInterval);
+            point.setX(prev->rx() + i*sendInterval());
             point.setY(prev->ry() + i*mult);
             points << point;
         }
@@ -148,10 +182,10 @@ qreal DCMotorWidget::nextX(const qreal &rx)
 
     qreal minX = (index == 0) ? 0 : m_scatter->points().value(index-1).rx();
     qreal maxX = m_scatter->points().value(index+1).rx();
-    qreal nextX = (floor(rx/m_sendInterval)) * m_sendInterval;
+    qreal nextX = (floor(rx/sendInterval())) * sendInterval();
 
-    minX += m_sendInterval;
-    maxX -= m_sendInterval;
+    minX += sendInterval();
+    maxX -= sendInterval();
     if (nextX < minX)
         nextX = minX;
     else if (nextX > maxX)
@@ -160,11 +194,38 @@ qreal DCMotorWidget::nextX(const qreal &rx)
     return nextX;
 }
 
+void DCMotorWidget::checkRemainder()
+{
+    int ticks = ui->ticksEdit->text().toInt();
+    if (ticks && (pointsInterval() % ticks) != 0) {
+        ui->warningsLabel->setText(tr("Warning: Interval cannot be divided to ticks without remainder"));
+    } else {
+        ui->warningsLabel->clear();
+    }
+}
+
+int DCMotorWidget::pointsInterval() const
+{
+    if (m_scatter->count() == 0) return 0;
+
+    if (m_scatter->count() == 1) {
+        return m_scatter->points().last().rx();
+    } else {
+        return m_scatter->points().last().rx() / (m_scatter->count() - 1);
+    }
+}
+
+int DCMotorWidget::sendInterval() const
+{
+    QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
+    return pointsInterval() / (xAxis->minorTickCount() + 1);
+}
+
 void DCMotorWidget::run()
 {
     if (!m_sender) return;
     clearScreen();
-    m_sender->start(pointsToSend(), m_sendInterval);
+    m_sender->start(pointsToSend(), sendInterval());
     ui->intervalEdit->setEnabled(false);
     ui->ticksEdit->setEnabled(false);
     ui->applyButton->setEnabled(false);
@@ -182,12 +243,6 @@ void DCMotorWidget::stop()
     ui->clearButton->setEnabled(true);
     m_chart->setEnabled(true);
     m_sendedPoints->clear();
-}
-
-void DCMotorWidget::addPoint(const QPointF &point)
-{
-    m_series->append(point);
-    m_scatter->append(point);
 }
 
 void DCMotorWidget::replacePoint(const QPointF &oldp, const QPointF &newp)
@@ -215,30 +270,35 @@ void DCMotorWidget::releasePoint(const QPointF &point)
     m_selected = QPointF();
 }
 
-void DCMotorWidget::resetXAxisRange()
+void DCMotorWidget::rescalePointsForNewInterval()
 {
-    int prev_interval = m_pointsInterval;
-    m_pointsInterval = ui->intervalEdit->text().toInt();
-    if (!m_pointsInterval) {
-        m_pointsInterval = INIT_INTERVAL;
-        ui->intervalEdit->setText(QString("%0").arg(m_pointsInterval));
+    int new_interval = ui->intervalEdit->text().toInt();
+    if (new_interval == pointsInterval()) {
+        return;
     }
+    clearScreen();
+    changeXAxisRange();
 
-    m_chart->axisX()->setRange(0, (m_series->count()-1)*m_pointsInterval);
     QList<QPointF> points;
-    float scaler = (float) m_pointsInterval / (float) prev_interval;
+    float scaler = (float) new_interval / (float) pointsInterval();
     for (int i = 0; i < m_scatter->points().count(); ++i) {
         QPointF oldP = m_scatter->at(i);
-        points << QPointF(oldP.rx()*scaler, oldP.ry());
+        points << QPointF(floor(oldP.rx()*scaler), oldP.ry());
     }
     m_series->replace(points);
     m_scatter->replace(points);
+    checkRemainder();
+}
+
+void DCMotorWidget::changeXAxisRange()
+{
+    m_chart->axisX()->setRange(0, (m_series->count()-1)*ui->intervalEdit->text().toInt());
 }
 
 void DCMotorWidget::changeXAxisMinorTicks()
 {
     /* To not allow send interval to be less than 1 ms */
-    int maxTicks = m_pointsInterval - 1;
+    int maxTicks = pointsInterval() - 1;
     ui->ticksEdit->setValidator(new QIntValidator(0, maxTicks));
     ui->ticksEdit->setPlaceholderText(QString("0-%0").arg(maxTicks));
     /* Check is new constraints are satisfied */
@@ -248,18 +308,18 @@ void DCMotorWidget::changeXAxisMinorTicks()
     /* Apply ticks */
     QValueAxis *xAxis = qobject_cast<QValueAxis*>(m_chart->axisX());
     xAxis->setMinorTickCount(ui->ticksEdit->text().toInt());
-    m_sendInterval = m_pointsInterval / (xAxis->minorTickCount() + 1);
+    checkRemainder();
 }
 
 void DCMotorWidget::drawRecievedPoint(int index, quint16 val)
 {
-    m_recievedPoints->append(m_sendInterval*index, val);
+    m_recievedPoints->append(sendInterval()*index, val);
 }
 
 void DCMotorWidget::drawSendedPoint(int index, quint16 val)
 {
     m_sendedPoints->clear();
-    m_sendedPoints->append(m_sendInterval*index, val);
+    m_sendedPoints->append(sendInterval()*index, val);
 }
 
 void DCMotorWidget::clearScreen()
@@ -271,17 +331,8 @@ void DCMotorWidget::clearScreen()
 
 void DCMotorWidget::applySettings()
 {
-    clearScreen();
-    if (m_sendInterval != ui->intervalEdit->text().toInt()) {
-        resetXAxisRange();
-    }
+    rescalePointsForNewInterval();
     changeXAxisMinorTicks();
-    int ticks = ui->ticksEdit->text().toInt();
-    if (ticks && (m_pointsInterval % ticks) != 0) {
-        ui->warningsLabel->setText(tr("Warning: Interval cannot be divided to ticks without remainder"));
-    } else {
-        ui->warningsLabel->clear();
-    }
 }
 
 DCMotorWidget::ChartView::ChartView(QChart *chart, DCMotorWidget *widget) :
