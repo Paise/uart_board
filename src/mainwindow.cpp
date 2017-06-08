@@ -187,6 +187,7 @@ void MainWindow::saveGraph()
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("Select a File"),
                                                     QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    if (filename.isEmpty()) return;
     QFile graphFile(filename);
 
     if (!graphFile.open(QFile::WriteOnly)) {
@@ -195,7 +196,7 @@ void MainWindow::saveGraph()
     }
 
     QDataStream out(&graphFile);
-    out << ui->DCTab->minorTicks() << ui->DCTab->userPoints();
+    out << ui->DCTab->minorTicks() << ui->DCTab->userPoints() << ui->DCTab->recievedPoints();
 
     graphFile.close();
     qDebug() << tr("Graph info succesfully saved to %0").arg(filename);
@@ -206,6 +207,7 @@ void MainWindow::loadGraph()
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Open a File"),
                                                     QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    if (filename.isEmpty()) return;
     QFile graphFile(filename);
 
     if (!graphFile.open(QFile::ReadOnly)) {
@@ -216,9 +218,11 @@ void MainWindow::loadGraph()
     QDataStream in(&graphFile);
     int ticks;
     QList<QPointF> points;
-    in >> ticks >> points;
+    QList<QPointF> pointsRec;
+    in >> ticks >> points >> pointsRec;
     ui->DCTab->setUserPoints(points);
     ui->DCTab->setMinorTicks(ticks);
+    ui->DCTab->setRecievedPoints(pointsRec);
 
     graphFile.close();
     qDebug() << tr("Graph info successfully loaded from %0").arg(filename);
