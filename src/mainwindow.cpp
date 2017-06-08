@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction( ui->actionStop );
     ui->mainToolBar->addAction( ui->actionDisconnect );
     ui->mainToolBar->addAction( ui->actionConfigure_Port );
+
+    ui->mainToolBar->addAction( ui->actionLoad );
+    ui->mainToolBar->addAction( ui->actionSave );
+
     ui->rawTab->setSerialDevice(m_serial);
     ui->DCTab->setSerialDevice(m_serial);
     ui->controlTab->setSerialDevice(m_serial);
@@ -45,6 +49,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->logsDockWidget, &QDockWidget::visibilityChanged, ui->actionShow_Logs, &QAction::setChecked);
     connect(ui->saveLogsButton, &QPushButton::clicked, this, &MainWindow::saveLogs);
     connect(ui->clearLogsButton, &QPushButton::clicked, ui->logsEdit, &QTextEdit::clear);
+
+    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveGraph);
+    connect(ui->actionLoad, &QAction::triggered, this, &MainWindow::loadGraph);
+
 }
 
 MainWindow::~MainWindow()
@@ -172,6 +180,48 @@ void MainWindow::saveLogs()
     logsFile.write(ui->logsEdit->toPlainText().toStdString().c_str());
     logsFile.close();
     qDebug() << tr("Log succesfully saved to %0").arg(filename);
+}
+
+void MainWindow::saveGraph()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("Select a File"),
+                                                    QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    QFile graphFile(filename);
+
+    if (!graphFile.open(QFile::WriteOnly)) {
+        qDebug() << tr("Failed to open file %0 to save graph points").arg(filename);
+        return;
+    }
+
+    QDataStream out(&graphFile);
+    out << ui->DCTab->minorTicks() << ui->DCTab->userPoints();
+
+    graphFile.close();
+    qDebug() << tr("Graph info succesfully saved to %0").arg(filename);
+}
+
+void MainWindow::loadGraph()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Open a File"),
+                                                    QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    QFile graphFile(filename);
+
+    if (!graphFile.open(QFile::ReadOnly)) {
+        qDebug() << tr("Failed to open file %0 to load graph points").arg(filename);
+        return;
+    }
+
+    QDataStream in(&graphFile);
+    int ticks;
+    QList<QPointF> points;
+    in >> ticks >> points;
+    ui->DCTab->setUserPoints(points);
+    ui->DCTab->setMinorTicks(ticks);
+
+    graphFile.close();
+    qDebug() << tr("Graph info successfully loaded from %0").arg(filename);
 }
 
 void MainWindow::configurePort()

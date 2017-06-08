@@ -61,6 +61,14 @@ private slots:
      */
     void saveLogs();
     /**
+      * @brief Сохранить точки из графика в файл
+      */
+    void saveGraph();
+    /**
+      * @brief Загрузить точки для графика из файла
+      */
+    void loadGraph();
+    /**
      * @brief Открыть окно настройки последовательного порта
      */
     void configurePort();
