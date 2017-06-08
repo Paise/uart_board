@@ -69,8 +69,6 @@ void MainWindow::showEvent(QShowEvent *)
     this->restoreGeometry(settings.value("geometry").toByteArray());
     this->restoreState(settings.value("state").toByteArray());
     settings.endGroup();
-
-    configurePort();
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

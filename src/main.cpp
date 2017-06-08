@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
     QCoreApplication::setApplicationVersion(APPLICATION_VERSION);
     w.setWindowTitle(APPLICATION_NAME);
+    w.configurePort();
     w.show();
 
     return a.exec();

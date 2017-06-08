@@ -51,6 +51,12 @@ private:
      */
     QStateMachine m_stateMachine;
 
+public slots:
+    /**
+     * @brief Открыть окно настройки последовательного порта
+     */
+    void configurePort();
+
 private slots:
     /**
      * @brief Показать окно About
@@ -68,10 +74,6 @@ private slots:
       * @brief Загрузить точки для графика из файла
       */
     void loadGraph();
-    /**
-     * @brief Открыть окно настройки последовательного порта
-     */
-    void configurePort();
 
     /**
      * @brief Вызывается при переходе в состояние Disconnected
