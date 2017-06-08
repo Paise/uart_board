@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction( ui->actionStop );
     ui->mainToolBar->addAction( ui->actionDisconnect );
     ui->mainToolBar->addAction( ui->actionConfigure_Port );
-
+    ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction( ui->actionLoad );
     ui->mainToolBar->addAction( ui->actionSave );
 
